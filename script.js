@@ -132,6 +132,44 @@ document.addEventListener('DOMContentLoaded', () => {
         // For our div slider, initial clip is set by CSS.
     });
 
+    // --- Side-by-Side Video Sync Logic ---
+    const sideBySidePairs = document.querySelectorAll('.side-by-side-video-pair');
+    sideBySidePairs.forEach(pairContainer => {
+        const videoLeft = pairContainer.querySelector('.video-left');
+        const videoRight = pairContainer.querySelector('.video-right');
+        // const playPauseBtn = pairContainer.querySelector('.play-pause-pair-btn'); // Button is removed
+
+        if (!videoLeft || !videoRight) { // Adjusted condition as button is no longer required
+            console.warn("Side-by-side video pair container missing required video elements:", pairContainer);
+            return;
+        }
+
+        // Autoplay videos (since they are muted and loop)
+        videoLeft.play().catch(error => console.error("Error attempting to autoplay videoLeft:", error));
+        videoRight.play().catch(error => console.error("Error attempting to autoplay videoRight:", error));
+
+        // Play/Pause logic tied to button is removed.
+        // playPauseBtn.addEventListener('click', togglePlayPausePair);
+
+        // Sync playback time (master: videoLeft, slave: videoRight)
+        videoLeft.addEventListener('timeupdate', () => {
+            if (Math.abs(videoLeft.currentTime - videoRight.currentTime) > 0.2) { // Sync if more than 0.2s diff
+                videoRight.currentTime = videoLeft.currentTime;
+            }
+        });
+
+        // Sync playback time (master: videoRight, slave: videoLeft) - for redundancy if one seeks
+        videoRight.addEventListener('timeupdate', () => {
+            if (Math.abs(videoRight.currentTime - videoLeft.currentTime) > 0.2) {
+                videoLeft.currentTime = videoRight.currentTime;
+            }
+        });
+        
+        // Optional: if you want them to start playing automatically when they scroll into view
+        // You might need an Intersection Observer for that.
+        // For now, they are muted and loop, and will play once the button is clicked.
+    });
+
     // JuxtaposeJS init for image sliders (if you keep it)
     // This will find all divs with class 'juxtapose' and initialize them
     // No specific JS needed here if you just include their library and use the class.

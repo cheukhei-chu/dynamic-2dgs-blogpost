@@ -125,6 +125,74 @@ pre { padding: 0.8em 1em; overflow-x: auto; line-height: 1.45; }
     box-shadow: 0 0 5px rgba(0,0,0,0.3);
 }
 
+/* Remove previous flex styling from figure.side-by-side-video-pair if it exists */
+figure.side-by-side-video-pair {
+    /* display: block; /* or whatever its default should be if not flex */
+    margin-bottom: 20px; /* Example margin for figures */
+}
+
+/* NEW: Styling for the video row within side-by-side figures */
+.video-row {
+    display: flex;
+    justify-content: center; /* Center items */
+    align-items: flex-start; /* Align to top if heights differ */
+    gap: 2%; /* Defines a 2% gap (of parent width) between video elements */
+    margin-bottom: 1em; /* Add some space below the row of videos, before the figcaption */
+}
+
+.video-row .video-left,
+.video-row .video-right {
+    width: 48%; /* Each video can take up to 48% of the .video-row width */
+    /* height: auto; is already global for video */
+}
+
+/* NEW CSS for video items, labels, and specific row layouts */
+.video-label {
+    font-family: var(--font-sans);
+    font-size: 0.85em;
+    color: #555;
+    margin-bottom: 0.3em;
+    text-align: center;
+    font-weight: 600;
+}
+
+.video-item { /* New class to wrap video and its label */
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Center label and video */
+}
+
+.video-item video {
+    width: 100%; /* Video takes full width of its .video-item container */
+    height: auto;
+    border-radius: 4px;
+    border: 1px solid var(--border-color); /* Add a light border to videos */
+}
+
+/* For rows with 2 videos, used by new section */
+.video-row-layout-2 .video-item {
+    width: 48%;
+}
+
+/* For rows with 3 videos, used by new section */
+.video-row-layout-3 .video-item {
+    width: 32%;
+}
+/* End of NEW CSS */
+
+/* Styling for tall boba videos in side-by-side comparison */
+.boba-video-pair .video-left {
+    width: auto !important; /* Let intrinsic size dictate width */
+    max-width: 45% !important; /* Ensure they don't get too wide, leave space for margin */
+    max-height: 400px !important;
+    margin-right: 1% !important; /* Explicit small margin for gap */
+}
+.boba-video-pair .video-right {
+    width: auto !important;
+    max-width: 45% !important;
+    max-height: 400px !important;
+    margin-left: 1% !important; /* Explicit small margin for gap */
+}
 
 .comparison-container figcaption { /* If you put figcaption inside comparison-container */
     position: absolute;

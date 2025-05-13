@@ -38,10 +38,11 @@
                 </li>
                 <li><a href="#results">4. Experiments & Results</a>
                     <ul>
-                        <li><a href="#teaser-demo">4.1 Teaser: Bear Recolor</a></li>
-                        <li><a href="#void-tracking">4.2 Void Tracking Comparison</a></li>
+                        <li><a href="#void-tracking">4.1 Void Tracking Comparison</a></li>
+                        <li><a href="#wave-effect">4.2 The 'Wave' Effect: Apparent Motion</a></li>
                         <li><a href="#gaussian-motion-viz">4.3 Gaussian Motion Analysis</a></li>
                         <li><a href="#limitations">4.4 Limitations</a></li>
+                        <li><a href="#teaser-demo">4.5 Teaser: Object Recolor & Removal</a></li>
                     </ul>
                 </li>
                 <li><a href="#discussion">5. Discussion</a></li>
@@ -96,28 +97,8 @@
                     <h2>4. Experiments & Results</h2>
                     <p>Detail your experimental setup: datasets (boba, bear, etc.), model parameters, training details, and evaluation metrics (qualitative focus, PSNR/SSIM for reconstruction).</p>
                     
-                    <section id="teaser-demo">
-                        <h3>4.1 Teaser: Object Recolor and Removal</h3>
-                        <p>The primary capability we aim for is robust object editing. Here we showcase our method\'s ability to recolor and remove a target object (a bear) with improved temporal consistency compared to a baseline model trained without optical flow guidance.</p>
-                        
-                        <!-- Interactive Slider for Bear Recolor -->
-                        <div class="comparison-container">
-                            <h4>Bear Recolor Comparison</h4>
-                            <div class="video-wrapper">
-                                <video autoplay loop muted playsinline width="100%" class="comparison-video-under">
-                                    <source src="videos/downstream/bear_39_bear interior_recolored_to_0_0_0_0_1_0_w0_20_iter10000_optflow30000_pts249243.MP4" type="video/mp4">
-                                </video>
-                                <video autoplay loop muted playsinline width="100%" class="comparison-video-over">
-                                    <source src="videos/downstream/bear_39.mp4" type="video/mp4">
-                                </video>
-                                <div class="comparison-slider"></div>
-                            </div>
-                            <figcaption>Fig. X: Interactive Video Slider: Original Bear (left) vs. Recolored Bear (right). (Drag the slider!)</figcaption>
-                        </div>
-                    </section>
-
                     <section id="void-tracking">
-                        <h3>4.2 Void Tracking: Baseline vs. Optical Flow</h3>
+                        <h3>4.1 Void Tracking: Baseline vs. Optical Flow</h3>
                         <p>A critical test for object removal is how well the "void" (the transparent region) tracks the removed object. The baseline model often exhibits a static void, while our optical flow supervised model shows improved tracking.</p>
                         <div class="comparison-container">
                             <h4>Boba Cup Removal: Void Tracking</h4>
@@ -138,17 +119,94 @@
                         </div>
                     </section>
 
+                    <section id="wave-effect">
+                        <h2>4.2 The 'Wave' Effect: Apparent Motion from Local Gaussian Activity</h2>
+                        <p>A common pitfall in optimizing dynamic explicit representations like Gaussian splatting solely for reconstruction is the emergence of what we term the "wave effect." Instead of a consistent set of Gaussians tracking an object, the appearance of motion can be achieved by different, spatially localized Gaussians activating and deactivating over time, much like a stadium wave. This creates an illusion of movement without true object coherence, hindering editing tasks. The following animation illustrates this concept metaphorically.</p>
+                        <figure>
+                            <img src="videos/fallacy/Lwave-Red-2.gif" alt="Wave effect metaphor: air molecules creating a wave" style="max-width: 60%; height: auto; border: 1px solid var(--border-color);">
+                            <figcaption>Fig. X: Metaphorical illustration of the 'wave effect'. Local elements (like air molecules or Gaussians) oscillate or activate sequentially, creating a propagating wave pattern, distinct from the collective, rigid movement of a defined object.</figcaption>
+                        </figure>
+
+                        <p>We observe this phenomenon in our baseline model for the <code>boba_69</code> experiment. The videos below show Gaussian centers and their rendered output when trained without explicit motion guidance.</p>
+                        <figure>
+                            <div class="video-row video-row-layout-2">
+                                <div class="video-item">
+                                    <p class="video-label">Gaussian Centers (Baseline)</p>
+                                    <video autoplay loop muted playsinline>
+                                        <source src="videos/fallacy/boba_69_centers_iter_10000_fast.mp4" type="video/mp4">
+                                        Your browser does not support the video tag.
+                                    </video>
+                                </div>
+                                <div class="video-item">
+                                    <p class="video-label">Rendered Video (Baseline)</p>
+                                    <video autoplay loop muted playsinline>
+                                        <source src="videos/fallacy/boba_69_rendered_original_only_iter_10000_fast.mp4" type="video/mp4">
+                                        Your browser does not support the video tag.
+                                    </video>
+                                </div>
+                            </div>
+                            <figcaption>Fig. Y: Baseline <code>boba_69</code> scene: Gaussian centers (left) and corresponding rendered output (right). Note the local activity rather than cohesive object motion.</figcaption>
+                        </figure>
+
+                        <p>Further diagnostic experiments highlight this. When Gaussians are initialized only in one region (e.g., the right half of the scene), they tend to remain localized or exhibit oscillatory behavior to reconstruct appearances, rather than translating coherently with perceived objects. This ultimately impacts tasks like object removal, where the "void" left by a removed object may not track the object's true path.</p>
+                        <figure>
+                            <div class="video-row video-row-layout-3">
+                                <div class="video-item">
+                                    <p class="video-label">Diag: Centers (Right Init)</p>
+                                    <video autoplay loop muted playsinline>
+                                        <source src="videos/fallacy/boba_69_diag_starts_right_centers.MP4" type="video/mp4">
+                                        Your browser does not support the video tag.
+                                    </video>
+                                </div>
+                                 <div class="video-item">
+                                    <p class="video-label">Diag: Rendered (Right Init)</p>
+                                    <video autoplay loop muted playsinline>
+                                        <source src="videos/fallacy/boba_69_diag_starts_right_rendered.MP4" type="video/mp4">
+                                        Your browser does not support the video tag.
+                                    </video>
+                                </div>
+                                <div class="video-item">
+                                    <p class="video-label">Removal Attempt (Baseline)</p>
+                                    <video autoplay loop muted playsinline>
+                                        <source src="videos/fallacy/boba_69_remove_iter10000.MP4" type="video/mp4">
+                                        Your browser does not support the video tag.
+                                    </video>
+                                </div>
+                            </div>
+                            <figcaption>Fig. Z: Diagnostic visualizations for <code>boba_69</code>: Gaussian centers after right-half initialization (left), corresponding render (middle), and an object removal attempt showing limited tracking (right).</figcaption>
+                        </figure>
+                    </section>
+
                     <section id="gaussian-motion-viz">
                         <h3>4.3 Gaussian Motion Analysis</h3>
                         <p>To understand *why* optical flow helps, we visualize the motion of Gaussians. The baseline model often shows Gaussians with local, oscillatory movements (the "wave effect"), while the flow-supervised model encourages more coherent, long-range transport.</p>
-                        <figure>
-                            <video controls loop muted playsinline width="48%" style="display: inline-block; margin-right: 2%;">
-                                <source src="videos/downstream/diagnostic_baseline_centers.mp4" type="video/mp4">
-                            </video>
-                            <video controls loop muted playsinline width="48%" style="display: inline-block;">
-                                <source src="videos/downstream/diagnostic_flow_centers.mp4" type="video/mp4">
-                            </video>
-                            <figcaption>Fig. X: Motion of Gaussian centers. Left: Baseline (oscillatory). Right: Optical Flow (more transport).</figcaption>
+                        <figure class="side-by-side-video-pair">
+                            <div class="video-row">
+                                <video loop muted playsinline width="48%" style="display: inline-block;" class="video-left">
+                                    <source src="videos/optical_flow/bear_39_centers_iter_10000_optflow0.mp4" type="video/mp4">
+                                </video>
+                                <video loop muted playsinline width="48%" style="display: inline-block;" class="video-right">
+                                    <source src="videos/optical_flow/bear_39_centers_iter_10000_optflow10000.mp4" type="video/mp4">
+                                </video>
+                            </div>
+                            <!-- <div class="sync-controls" style="text-align: center; margin-top: 10px;">
+                                <button class="play-pause-pair-btn">Play Bear Comparison</button>
+                            </div> -->
+                            <figcaption>Fig. X: Gaussian center tracks for Bear scene. Left: Baseline (No Flow Loss). Right: With Optical Flow Loss.</figcaption>
+                        </figure>
+                        <figure class="side-by-side-video-pair boba-video-pair">
+                            <div class="video-row">
+                                <video loop muted playsinline width="48%" style="display: inline-block;" class="video-left">
+                                    <source src="videos/optical_flow/boba_40_centers_iter_10000_optflow0.mp4" type="video/mp4">
+                                </video>
+                                <video loop muted playsinline width="48%" style="display: inline-block;" class="video-right">
+                                    <source src="videos/optical_flow/boba_40_centers_iter_10000_optflow100000.mp4" type="video/mp4">
+                                </video>
+                            </div>
+                            <!-- <div class="sync-controls" style="text-align: center; margin-top: 10px;">
+                                <button class="play-pause-pair-btn">Play Boba Comparison</button>
+                            </div> -->
+                            <figcaption>Fig. Y: Gaussian center tracks for Boba scene. Left: Baseline (No Flow Loss). Right: With Optical Flow Loss.</figcaption>
                         </figure>
                     </section>
                     
@@ -161,6 +219,26 @@
                             </video>
                             <figcaption>Fig. X: Example of tracking degradation over a longer sequence (e.g., after 50 frames).</figcaption>
                         </figure>
+                    </section>
+
+                    <section id="teaser-demo">
+                        <h3>4.5 Teaser: Object Recolor and Removal</h3>
+                        <p>The primary capability we aim for is robust object editing. Here we showcase our method's ability to recolor and remove a target object (a bear) with improved temporal consistency compared to a baseline model trained without optical flow guidance.</p>
+                        
+                        <!-- Interactive Slider for Bear Recolor -->
+                        <div class="comparison-container">
+                            <h4>Bear Recolor Comparison</h4>
+                            <div class="video-wrapper">
+                                <video autoplay loop muted playsinline width="100%" class="comparison-video-under">
+                                    <source src="videos/downstream/bear_39_bear interior_recolored_to_0_0_0_0_1_0_w0_20_iter10000_optflow30000_pts249243.MP4" type="video/mp4">
+                                </video>
+                                <video autoplay loop muted playsinline width="100%" class="comparison-video-over">
+                                    <source src="videos/downstream/bear_39.mp4" type="video/mp4">
+                                </video>
+                                <div class="comparison-slider"></div>
+                            </div>
+                            <figcaption>Fig. X: Interactive Video Slider: Original Bear (left) vs. Recolored Bear (right). (Drag the slider!)</figcaption>
+                        </div>
                     </section>
                 </section>
 
