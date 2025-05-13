@@ -13,9 +13,14 @@
     --font-serif: 'Source Serif Pro', Georgia, Cambria, "Times New Roman", Times, serif;
     --font-mono: 'Roboto Mono', Menlo, Monaco, Consolas, "Courier New", monospace;
 
-    --main-content-width: 720px; /* Max width for readable text column */
-    --toc-width: 240px;
-    --container-padding: 20px;
+    --main-content-max-width: 800px; /* Max width for the readable text content itself */
+    --toc-width: 170px; /* Width of the TOC */
+    --base-padding: 20px; /* Base padding unit */
+    --gap-between-toc-and-content: 30px; /* << NEW VARIABLE for the gap */
+
+    /* This variable now controls how much of the screen the *entire* layout uses */
+    --overall-page-max-width: 90vw; /* e.g., use 90% of viewport width */
+    --overall-page-cap-width: 1600px; /* Don't let it exceed this in pixels */
 }
 
 html {
@@ -35,30 +40,32 @@ body {
     -moz-osx-font-smoothing: grayscale;
 }
 
-/* --- Main Layout: Container for TOC and Content --- */
-.page-container { /* Renamed from .container to avoid conflicts if you use bootstrap etc. */
-    display: flex;
-    flex-direction: row;
-    max-width: calc(var(--main-content-width) + var(--toc-width) + (var(--container-padding) * 4)); /* Approx total width */
-    margin: 0 auto;
-    padding: 0 var(--container-padding);
+/* --- Overall Page Structure --- */
+.page-container {
+    /* This container will be centered and control overall width */
+    display: flex; /* Use flex to arrange TOC and main content */
+    width: var(--overall-page-max-width);
+    max-width: var(--overall-page-cap-width);
+    margin: 0 auto; /* Center the whole thing */
+    position: relative; /* For positioning context if needed, but not strictly for this layout */
 }
 
-/* --- Table of Contents --- */
+/* --- Table of Contents (Fixed/Sticky on the Left) --- */
 #table-of-contents {
     font-family: var(--font-sans);
     width: var(--toc-width);
-    padding: var(--container-padding);
-    padding-top: 80px; /* Space from top, adjust if you have a fixed header */
-    border-right: 1px solid var(--toc-border);
+    flex-shrink: 0; /* Prevent TOC from shrinking if space is tight */
+    padding: var(--base-padding);
+    padding-top: calc(var(--base-padding) + 60px);
+    /* No border-right here, the gap provides visual separation */
     height: 100vh;
-    position: sticky;
+    position: sticky; /* Sticky within the flex container */
     top: 0;
     overflow-y: auto;
     background-color: var(--toc-background);
     font-size: 0.85rem;
     line-height: 1.5;
-    flex-shrink: 0; /* Prevent TOC from shrinking */
+    z-index: 100; /* Ensure it's above other content if overlaps occur */
 }
 
 #table-of-contents h3 {
@@ -108,16 +115,18 @@ body {
     font-size: 0.95em;
 }
 
-
-/* --- Main Content Area --- */
-.main-content-column { /* Renamed from .content */
-    font-family: var(--font-serif); /* Ensure serif for article text */
-    flex-grow: 1;
-    padding: var(--container-padding) calc(var(--container-padding) * 2); /* More horizontal padding */
-    max-width: var(--main-content-width); /* Readable text column */
-    /* If you want the content to be centered when TOC is not present (mobile), add margin: 0 auto here */
+.main-content-column {
+    font-family: var(--font-serif);
+    flex-grow: 1; /* Takes up remaining space in the flex container */
+    /* Padding on the left creates the gap */
+    padding: var(--base-padding) calc(var(--base-padding) * 2) var(--base-padding) var(--gap-between-toc-and-content);
+    max-width: var(--main-content-max-width);
+    /* No margin-left/right auto needed here if flex-grow is used,
+       but max-width will constrain the text. If main-content-max-width
+       is less than the space available (flex-grow), it will align left
+       within its flex item space. To center it *within its flex item space*: */
+    margin: 0 auto; /* This will center the max-width block within the space allocated by flex-grow */
 }
-
 
 /* --- Header within Main Content --- */
 .main-content-column header {
@@ -272,18 +281,20 @@ pre {
 }
 
 /* --- Responsive adjustments --- */
-@media (max-width: 1000px) { /* Breakpoint when TOC hides */
+@media (max-width: 1000px) { /* When TOC is hidden */
     .page-container {
-        flex-direction: column;
+        /* No longer flex, or adjust flex properties */
+        display: block; /* Or whatever makes sense for single column */
+        width: auto; /* Let it take natural width or set a mobile width like 95vw */
+        padding: 0 var(--base-padding); /* Padding on the sides of the page for mobile */
     }
-
     #table-of-contents {
-        display: none; /* Hide TOC. Consider a hamburger menu to reveal it */
+        display: none;
     }
-
     .main-content-column {
-        padding: var(--container-padding); /* Adjust padding */
-        margin: 0 auto; /* Center the content column fully */
+        padding: var(--base-padding); /* Reset padding */
+        margin: 0 auto; /* Ensure centering */
+        max-width: min(var(--main-content-max-width), 95vw);
     }
 }
 
