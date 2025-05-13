@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Project Title - Dynamic 2D Gaussian Splatting</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Roboto+Mono:wght@400;500&family=Source+Serif+Pro:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container"> <!-- Main wrapper for content and TOC -->
+        <nav id="table-of-contents">
+            <h3>Table of Contents</h3>
+            <ul>
+                <li><a href="#introduction">Introduction</a></li>
+                <li><a href="#background">Background</a></li>
+                <li><a href="#methodology">Methodology</a></li>
+                <li><a href="#results">Results & Comparisons</a>
+                    <ul> <!-- Optional: Sub-menu for H3s -->
+                        <li><a href="#qualitative-results">Qualitative Results</a></li>
+                        <li><a href="#interactive-comparison">Interactive Comparison</a></li>
+                        <li><a href="#segmentation-viz">Segmentation Visualization</a></li>
+                        <li><a href="#plots-metrics">Plots & Metrics</a></li>
+                    </ul>
+                </li>
+                <li><a href="#discussion">Discussion & Future Work</a></li>
+                <li><a href="#conclusion">Conclusion</a></li>
+                <li><a href="#references">References</a></li>
+            </ul>
+        </nav>
+
+        <main class="content"> <!-- Wrapper for the main article content -->
+            <header>
+                <h1>Your Awesome Project Title</h1>
+                <p class="subtitle">Exploring Dynamic 2D Gaussian Splatting for Video Editing</p>
+                <p class="authors">Your Name(s)</p>
+                <p class="date">Month Day, Year</p>
+            </header>
+
+            <article>
+                <section id="introduction">
+                    <h2>Introduction</h2>
+                    <p>Start with a compelling introduction to your project, the problem you're solving, and a brief overview of your approach and findings...</p>
+                    <!-- Example of embedding a teaser image/video -->
+                    <figure>
+                        <video controls autoplay loop muted playsinline width="100%">
+                            <source src="videos/teaser_video.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                        <figcaption>Fig 1: Teaser showing the capabilities of our method.</figcaption>
+                    </figure>
+                </section>
+
+                <section id="background">
+                    <h2>Background</h2>
+                    <p>Briefly explain 2D Gaussian Splatting, SAM, optical flow, or any other core concepts your readers need to understand...</p>
+                </section>
+
+                <section id="methodology">
+                    <h2>Our Approach</h2>
+                    <p>Describe your pipeline, the modifications you made, the training process, segmentation, editing actions, etc.</p>
+                    <!-- Example of embedding a static image -->
+                    <figure>
+                        <img src="images/pipeline_diagram.png" alt="Our Project Pipeline" style="max-width: 100%; height: auto;">
+                        <figcaption>Fig 2: Diagram of our project pipeline.</figcaption>
+                    </figure>
+                </section>
+
+                <section id="results">
+                    <h2>Results & Comparisons</h2>
+                    <p>This is where you'll showcase your outputs, comparisons, and interactive elements.</p>
+
+                    <h3>Qualitative Results: Video Editing</h3>
+                    <p>Here we show a video of object removal and recoloring...</p>
+                    <figure>
+                        <video controls loop muted playsinline width="100%">
+                            <source src="videos/object_removal_cow.mp4" type="video/mp4">
+                        </video>
+                        <figcaption>Fig 3: Object removal (cow) from the video.</figcaption>
+                    </figure>
+                    <figure>
+                        <video controls loop muted playsinline width="100%">
+                            <source src="videos/object_recolor_cow_blue.mp4" type="video/mp4">
+                        </video>
+                        <figcaption>Fig 4: Object recoloring (cow to blue).</figcaption>
+                    </figure>
+
+                    <h3>Interactive Comparison: Method A vs. Method B</h3>
+                    <div class="interactive-comparison">
+                        <div class="video-container">
+                            <video id="videoA" loop muted playsinline>
+                                <source src="videos/method_A_output.mp4" type="video/mp4">
+                            </video>
+                            <p class="video-label">Method A: Baseline</p>
+                        </div>
+                        <div class="video-container">
+                            <video id="videoB" loop muted playsinline>
+                                <source src="videos/method_B_output_flow.mp4" type="video/mp4">
+                            </video>
+                            <p class="video-label">Method B: With Optical Flow Guidance</p>
+                        </div>
+                        <div class="slider-container">
+                            <label for="comparisonSlider">Slide to Compare (A vs. B):</label>
+                            <input type="range" min="0" max="100" value="50" class="slider" id="comparisonSlider">
+                        </div>
+                        <div class="sync-controls">
+                            <button id="playPauseBtn">Play/Pause All</button>
+                            <button id="syncBtn">Sync Videos</button>
+                        </div>
+                    </div>
+                    <figcaption>Fig 5: Interactive slider to compare videos from two methods. The slider controls the opacity/visibility or a clipping mask.</figcaption>
+
+                    <h3>Segmentation Visualization</h3>
+                    <figure>
+                        <img src="images/segmentation_output_frame0.png" alt="Segmentation Mask" style="max-width: 60%; height: auto;">
+                        <figcaption>Fig 6: Example segmentation mask for a keyframe.</figcaption>
+                    </figure>
+
+                    <h3>Plots & Metrics</h3>
+                    <p>Discuss quantitative results, training curves, etc.</p>
+                    <figure>
+                        <img src="plots/psnr_curve.png" alt="PSNR Training Curve" style="max-width: 70%; height: auto;">
+                        <figcaption>Fig 7: PSNR training curve for one of our experiments.</figcaption>
+                    </figure>
+                    <!-- You can also embed interactive plots using libraries like Plotly.js or Chart.js -->
+
+                </section>
+
+                <section id="discussion">
+                    <h2>Discussion & Future Work</h2>
+                    <p>Discuss the strengths, limitations, and potential future directions...</p>
+                </section>
+
+                <section id="conclusion">
+                    <h2>Conclusion</h2>
+                    <p>Summarize your key findings and contributions.</p>
+                </section>
+
+                <section id="references">
+                    <h2>References</h2>
+                    <ul>
+                        <li>[1] Kerbl, B., Kopanas, G., Leimkühler, T., & Drettakis, G. (2023). 3D Gaussian Splatting for Real-Time Radiance Field Rendering.</li>
+                        <li>[2] Kirillov, A., Mintun, E., Ravi, N., Mao, H., Rolland, C., Gustafson, L., ... & Girshick, R. (2023). Segment Anything.</li>
+                        <li>(Add your other references)</li>
+                    </ul>
+                </section>
+
+                <footer>
+                    <p>© Year Your Name(s). Code for this post might be available at <a href="your_github_repo_link">GitHub</a>.</p>
+                </footer>
+            </article>
+        </main>
+    </div>
+
+    <script src="script.js"></script> <!-- We'll create this -->
+</body>
+</html>

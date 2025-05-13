@@ -1,0 +1,309 @@
+/* --- Base and Resets --- */
+:root {
+    --text-color: #202020; /* Dark gray for text */
+    --background-color: #ffffff; /* White background */
+    --link-color: #0072BC; /* A common academic blue for links */
+    --link-hover-color: #005082;
+    --border-color: #e8e8e8; /* Light gray for borders */
+    --code-background: #f5f5f5;
+    --toc-background: #fcfcfc;
+    --toc-border: #efefef;
+
+    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+    --font-serif: 'Source Serif Pro', Georgia, Cambria, "Times New Roman", Times, serif;
+    --font-mono: 'Roboto Mono', Menlo, Monaco, Consolas, "Courier New", monospace;
+
+    --main-content-width: 720px; /* Max width for readable text column */
+    --toc-width: 240px;
+    --container-padding: 20px;
+}
+
+html {
+    scroll-padding-top: 20px; /* Offset for sticky header/TOC when jumping to #ids */
+    scroll-behavior: smooth; /* Smooth scrolling for #links */
+}
+
+body {
+    font-family: var(--font-serif);
+    font-size: 1.1rem; /* Slightly larger base font size for readability */
+    line-height: 1.7;
+    color: var(--text-color);
+    background-color: var(--background-color);
+    margin: 0;
+    padding: 0;
+    -webkit-font-smoothing: antialiased; /* Better font rendering */
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* --- Main Layout: Container for TOC and Content --- */
+.page-container { /* Renamed from .container to avoid conflicts if you use bootstrap etc. */
+    display: flex;
+    flex-direction: row;
+    max-width: calc(var(--main-content-width) + var(--toc-width) + (var(--container-padding) * 4)); /* Approx total width */
+    margin: 0 auto;
+    padding: 0 var(--container-padding);
+}
+
+/* --- Table of Contents --- */
+#table-of-contents {
+    font-family: var(--font-sans);
+    width: var(--toc-width);
+    padding: var(--container-padding);
+    padding-top: 80px; /* Space from top, adjust if you have a fixed header */
+    border-right: 1px solid var(--toc-border);
+    height: 100vh;
+    position: sticky;
+    top: 0;
+    overflow-y: auto;
+    background-color: var(--toc-background);
+    font-size: 0.85rem;
+    line-height: 1.5;
+    flex-shrink: 0; /* Prevent TOC from shrinking */
+}
+
+#table-of-contents h3 {
+    margin-top: 0;
+    margin-bottom: 1em;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #555;
+}
+
+#table-of-contents ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+#table-of-contents ul li {
+    margin-bottom: 0.6em;
+}
+
+#table-of-contents ul li a {
+    text-decoration: none;
+    color: #444; /* Subtler link color for TOC */
+    display: block; /* Make the whole area clickable */
+    padding: 2px 0;
+}
+
+#table-of-contents ul li a:hover {
+    color: var(--link-color);
+}
+
+#table-of-contents ul li a.active {
+    color: var(--link-color);
+    font-weight: 600;
+    border-left: 2px solid var(--link-color); /* Active indicator */
+    padding-left: 10px; /* Adjust with border */
+    margin-left: -12px; /* Adjust with border and padding */
+}
+
+#table-of-contents ul ul { /* Sub-menu */
+    padding-left: 1em;
+    margin-top: 0.5em;
+}
+#table-of-contents ul ul li {
+    font-size: 0.95em;
+}
+
+
+/* --- Main Content Area --- */
+.main-content-column { /* Renamed from .content */
+    font-family: var(--font-serif); /* Ensure serif for article text */
+    flex-grow: 1;
+    padding: var(--container-padding) calc(var(--container-padding) * 2); /* More horizontal padding */
+    max-width: var(--main-content-width); /* Readable text column */
+    /* If you want the content to be centered when TOC is not present (mobile), add margin: 0 auto here */
+}
+
+
+/* --- Header within Main Content --- */
+.main-content-column header {
+    text-align: center;
+    margin-bottom: 3rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.main-content-column header h1 {
+    font-family: var(--font-sans);
+    font-size: 2.8rem; /* Larger title */
+    font-weight: 700;
+    margin-bottom: 0.3em;
+    color: #111;
+    line-height: 1.2;
+}
+
+.main-content-column .subtitle {
+    font-family: var(--font-sans);
+    font-size: 1.3rem;
+    color: #555;
+    margin-bottom: 1em;
+}
+
+.main-content-column .authors,
+.main-content-column .date {
+    font-family: var(--font-sans);
+    font-size: 0.9rem;
+    color: #777;
+}
+
+/* --- Article Elements --- */
+article h2 {
+    font-family: var(--font-sans);
+    font-size: 1.9rem;
+    font-weight: 600;
+    margin-top: 2.5rem;
+    margin-bottom: 1rem;
+    padding-bottom: 0.3rem;
+    border-bottom: 1px solid var(--border-color);
+    color: #111;
+    line-height: 1.3;
+}
+
+article h3 {
+    font-family: var(--font-sans);
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-top: 2rem;
+    margin-bottom: 0.8rem;
+    color: #222;
+    line-height: 1.3;
+}
+
+p, li { /* Apply serif to list items as well */
+    font-family: var(--font-serif);
+    margin-bottom: 1.1em;
+}
+
+figure {
+    margin: 2.5rem auto; /* Center figures that are narrower than content width */
+    text-align: center;
+}
+
+figcaption {
+    font-family: var(--font-sans);
+    font-size: 0.9rem;
+    color: #666;
+    margin-top: 0.75em;
+    line-height: 1.4;
+}
+
+video, img {
+    max-width: 100%; /* Default for responsive images/videos within the column */
+    height: auto;
+    border-radius: 4px;
+    /* Optional subtle shadow, Distill is often flatter */
+    /* box-shadow: 0 2px 8px rgba(0,0,0,0.05); */
+    display: block; /* Helps with centering if margin auto is used on parent */
+    margin: 0 auto; /* Center within figure */
+}
+
+/* Full-width figures (optional) - needs JS to move out of column or careful CSS */
+.figure-full-width {
+    width: 100vw; /* Viewport width */
+    max-width: none; /* Override any max-width from parent */
+    position: relative;
+    left: 50%;
+    right: 50%;
+    margin-left: -50vw;
+    margin-right: -50vw;
+    /* Add padding if needed, or let the content inside handle it */
+}
+.figure-full-width img,
+.figure-full-width video {
+    /* Potentially no border-radius for full-width elements */
+}
+
+
+a {
+    color: var(--link-color);
+    text-decoration: none;
+    /* Optional: subtle underline for links in body text */
+    /* text-decoration: underline;
+    text-decoration-color: alpha(var(--link-color), 0.3);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 2px; */
+}
+
+a:hover {
+    color: var(--link-hover-color);
+    text-decoration: underline;
+}
+
+code, pre {
+    font-family: var(--font-mono);
+    background-color: var(--code-background);
+    padding: 0.15em 0.4em;
+    border-radius: 3px;
+    font-size: 0.9em; /* Slightly smaller than body text */
+    border: 1px solid var(--border-color);
+}
+
+pre {
+    padding: 0.8em 1em;
+    overflow-x: auto;
+    line-height: 1.45;
+}
+
+/* --- Interactive Comparison Specifics --- */
+.interactive-comparison {
+    /* Keep styles from before, ensure they fit within the content column */
+    margin: 2rem 0; /* Standard margin */
+}
+/* Ensure interactive elements don't overflow the main content column */
+.interactive-comparison .video-comparison-wrapper,
+.interactive-comparison .slider-container {
+    max-width: 100%;
+}
+
+
+/* --- Footer --- */
+.main-content-column footer {
+    font-family: var(--font-sans);
+    text-align: center;
+    margin-top: 4rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--border-color);
+    font-size: 0.85rem;
+    color: #777;
+}
+
+/* --- Responsive adjustments --- */
+@media (max-width: 1000px) { /* Breakpoint when TOC hides */
+    .page-container {
+        flex-direction: column;
+    }
+
+    #table-of-contents {
+        display: none; /* Hide TOC. Consider a hamburger menu to reveal it */
+    }
+
+    .main-content-column {
+        padding: var(--container-padding); /* Adjust padding */
+        margin: 0 auto; /* Center the content column fully */
+    }
+}
+
+@media (max-width: 600px) { /* Further adjustments for small screens */
+    body {
+        font-size: 1rem;
+    }
+    .main-content-column header h1 {
+        font-size: 2rem;
+    }
+    .main-content-column .subtitle {
+        font-size: 1.1rem;
+    }
+    article h2 {
+        font-size: 1.5rem;
+    }
+    article h3 {
+        font-size: 1.25rem;
+    }
+    .main-content-column {
+        padding: 15px;
+    }
+}
