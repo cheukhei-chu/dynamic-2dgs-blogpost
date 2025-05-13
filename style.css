@@ -1,320 +1,162 @@
-/* --- Base and Resets --- */
+/* --- Base and Resets (Keep from previous version) --- */
 :root {
-    --text-color: #202020; /* Dark gray for text */
-    --background-color: #ffffff; /* White background */
-    --link-color: #0072BC; /* A common academic blue for links */
-    --link-hover-color: #005082;
-    --border-color: #e8e8e8; /* Light gray for borders */
-    --code-background: #f5f5f5;
-    --toc-background: #fcfcfc;
-    --toc-border: #efefef;
-
-    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-    --font-serif: 'Source Serif Pro', Georgia, Cambria, "Times New Roman", Times, serif;
-    --font-mono: 'Roboto Mono', Menlo, Monaco, Consolas, "Courier New", monospace;
-
-    --main-content-max-width: 800px; /* Max width for the readable text content itself */
-    --toc-width: 170px; /* Width of the TOC */
-    --base-padding: 20px; /* Base padding unit */
-    --gap-between-toc-and-content: 30px; /* << NEW VARIABLE for the gap */
-
-    /* This variable now controls how much of the screen the *entire* layout uses */
-    --overall-page-max-width: 90vw; /* e.g., use 90% of viewport width */
-    --overall-page-cap-width: 1600px; /* Don't let it exceed this in pixels */
+    --text-color: #202020; --background-color: #ffffff; --link-color: #0072BC;
+    --link-hover-color: #005082; --border-color: #e8e8e8; --code-background: #f5f5f5;
+    --toc-background: #fcfcfc; --toc-border: #efefef;
+    --font-sans: 'Inter', sans-serif; --font-serif: 'Source Serif Pro', serif;
+    --font-mono: 'Roboto Mono', monospace;
+    --main-content-max-width: 800px; --toc-width: 200px; /* Increased TOC width slightly */
+    --base-padding: 20px; --gap-between-toc-and-content: 40px; /* Increased gap */
+    --overall-page-max-width: 90vw; --overall-page-cap-width: 1600px;
 }
-
-html {
-    scroll-padding-top: 20px; /* Offset for sticky header/TOC when jumping to #ids */
-    scroll-behavior: smooth; /* Smooth scrolling for #links */
-}
-
+html { scroll-padding-top: 20px; scroll-behavior: smooth; }
 body {
-    font-family: var(--font-serif);
-    font-size: 1.1rem; /* Slightly larger base font size for readability */
-    line-height: 1.7;
-    color: var(--text-color);
-    background-color: var(--background-color);
-    margin: 0;
-    padding: 0;
-    -webkit-font-smoothing: antialiased; /* Better font rendering */
-    -moz-osx-font-smoothing: grayscale;
+    font-family: var(--font-serif); font-size: 1.1rem; line-height: 1.7;
+    color: var(--text-color); background-color: var(--background-color);
+    margin: 0; padding: 0; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
 }
 
-/* --- Overall Page Structure --- */
-.page-container {
-    /* This container will be centered and control overall width */
-    display: flex; /* Use flex to arrange TOC and main content */
-    width: var(--overall-page-max-width);
-    max-width: var(--overall-page-cap-width);
-    margin: 0 auto; /* Center the whole thing */
-    position: relative; /* For positioning context if needed, but not strictly for this layout */
-}
+/* --- Overall Page Structure (Keep from previous version) --- */
+.page-container { display: flex; width: var(--overall-page-max-width); max-width: var(--overall-page-cap-width); margin: 0 auto; }
 
-/* --- Table of Contents (Fixed/Sticky on the Left) --- */
+/* --- Table of Contents (Keep from previous version, minor style tweaks) --- */
 #table-of-contents {
-    font-family: var(--font-sans);
-    width: var(--toc-width);
-    flex-shrink: 0; /* Prevent TOC from shrinking if space is tight */
-    padding: var(--base-padding);
-    padding-top: calc(var(--base-padding) + 60px);
-    /* No border-right here, the gap provides visual separation */
-    height: 100vh;
-    position: sticky; /* Sticky within the flex container */
-    top: 0;
-    overflow-y: auto;
-    background-color: var(--toc-background);
-    font-size: 0.85rem;
-    line-height: 1.5;
-    z-index: 100; /* Ensure it's above other content if overlaps occur */
+    font-family: var(--font-sans); width: var(--toc-width); flex-shrink: 0;
+    padding: var(--base-padding); padding-top: calc(var(--base-padding) + 20px); /* Adjusted top padding */
+    height: 100vh; position: sticky; top: 0; overflow-y: auto;
+    background-color: var(--toc-background); font-size: 0.85rem; line-height: 1.5;
+    border-right: 1px solid var(--toc-border); /* Add a subtle border back */
 }
+#table-of-contents h3 { margin-top: 0; margin-bottom: 1em; font-size: 0.9rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: #555; }
+#table-of-contents ul { list-style: none; padding: 0; margin: 0; }
+#table-of-contents ul li { margin-bottom: 0.6em; }
+#table-of-contents ul li a { text-decoration: none; color: #444; display: block; padding: 3px 0; transition: color 0.2s ease, padding-left 0.2s ease; }
+#table-of-contents ul li a:hover { color: var(--link-color); }
+#table-of-contents ul li a.active { color: var(--link-color); font-weight: 600; border-left: 3px solid var(--link-color); padding-left: 10px; margin-left: -13px; }
+#table-of-contents ul ul { padding-left: 1em; margin-top: 0.5em; }
+#table-of-contents ul ul li { font-size: 0.95em; }
 
-#table-of-contents h3 {
-    margin-top: 0;
-    margin-bottom: 1em;
-    font-size: 0.9rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    color: #555;
-}
-
-#table-of-contents ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-#table-of-contents ul li {
-    margin-bottom: 0.6em;
-}
-
-#table-of-contents ul li a {
-    text-decoration: none;
-    color: #444; /* Subtler link color for TOC */
-    display: block; /* Make the whole area clickable */
-    padding: 2px 0;
-}
-
-#table-of-contents ul li a:hover {
-    color: var(--link-color);
-}
-
-#table-of-contents ul li a.active {
-    color: var(--link-color);
-    font-weight: 600;
-    border-left: 2px solid var(--link-color); /* Active indicator */
-    padding-left: 10px; /* Adjust with border */
-    margin-left: -12px; /* Adjust with border and padding */
-}
-
-#table-of-contents ul ul { /* Sub-menu */
-    padding-left: 1em;
-    margin-top: 0.5em;
-}
-#table-of-contents ul ul li {
-    font-size: 0.95em;
-}
-
+/* --- Main Content Column (Keep from previous version) --- */
 .main-content-column {
-    font-family: var(--font-serif);
-    flex-grow: 1; /* Takes up remaining space in the flex container */
-    /* Padding on the left creates the gap */
+    font-family: var(--font-serif); flex-grow: 1;
     padding: var(--base-padding) calc(var(--base-padding) * 2) var(--base-padding) var(--gap-between-toc-and-content);
-    max-width: var(--main-content-max-width);
-    /* No margin-left/right auto needed here if flex-grow is used,
-       but max-width will constrain the text. If main-content-max-width
-       is less than the space available (flex-grow), it will align left
-       within its flex item space. To center it *within its flex item space*: */
-    margin: 0 auto; /* This will center the max-width block within the space allocated by flex-grow */
+    max-width: var(--main-content-max-width); margin: 0 auto; /* Centers if space available */
 }
+.main-content-column header { text-align: center; margin-bottom: 3rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border-color); }
+.main-content-column header h1 { font-family: var(--font-sans); font-size: 2.8rem; font-weight: 700; margin-bottom: 0.3em; color: #111; line-height: 1.2; }
+.main-content-column .subtitle { font-family: var(--font-sans); font-size: 1.3rem; color: #555; margin-bottom: 1em; }
+.main-content-column .authors, .main-content-column .date { font-family: var(--font-sans); font-size: 0.9rem; color: #777; }
 
-/* --- Header within Main Content --- */
-.main-content-column header {
-    text-align: center;
-    margin-bottom: 3rem;
-    padding-bottom: 1.5rem;
-    border-bottom: 1px solid var(--border-color);
-}
+/* --- Article Elements (Keep from previous version) --- */
+article h2 { font-family: var(--font-sans); font-size: 1.9rem; font-weight: 600; margin-top: 2.5rem; margin-bottom: 1rem; padding-bottom: 0.3rem; border-bottom: 1px solid var(--border-color); color: #111; line-height: 1.3; }
+article h3 { font-family: var(--font-sans); font-size: 1.5rem; font-weight: 600; margin-top: 2rem; margin-bottom: 0.8rem; color: #222; line-height: 1.3; }
+p, li { font-family: var(--font-serif); margin-bottom: 1.1em; }
+figure { margin: 2.5rem auto; text-align: center; }
+figcaption { font-family: var(--font-sans); font-size: 0.9rem; color: #666; margin-top: 0.75em; line-height: 1.4; }
+video, img { max-width: 100%; height: auto; border-radius: 4px; display: block; margin: 0 auto; }
+a { color: var(--link-color); text-decoration: none; }
+a:hover { color: var(--link-hover-color); text-decoration: underline; }
+code, pre { font-family: var(--font-mono); background-color: var(--code-background); padding: 0.15em 0.4em; border-radius: 3px; font-size: 0.9em; border: 1px solid var(--border-color); }
+pre { padding: 0.8em 1em; overflow-x: auto; line-height: 1.45; }
 
-.main-content-column header h1 {
-    font-family: var(--font-sans);
-    font-size: 2.8rem; /* Larger title */
-    font-weight: 700;
-    margin-bottom: 0.3em;
-    color: #111;
-    line-height: 1.2;
-}
-
-.main-content-column .subtitle {
-    font-family: var(--font-sans);
-    font-size: 1.3rem;
-    color: #555;
-    margin-bottom: 1em;
-}
-
-.main-content-column .authors,
-.main-content-column .date {
-    font-family: var(--font-sans);
-    font-size: 0.9rem;
-    color: #777;
-}
-
-/* --- Article Elements --- */
-article h2 {
-    font-family: var(--font-sans);
-    font-size: 1.9rem;
-    font-weight: 600;
-    margin-top: 2.5rem;
-    margin-bottom: 1rem;
-    padding-bottom: 0.3rem;
-    border-bottom: 1px solid var(--border-color);
-    color: #111;
-    line-height: 1.3;
-}
-
-article h3 {
-    font-family: var(--font-sans);
-    font-size: 1.5rem;
-    font-weight: 600;
-    margin-top: 2rem;
-    margin-bottom: 0.8rem;
-    color: #222;
-    line-height: 1.3;
-}
-
-p, li { /* Apply serif to list items as well */
-    font-family: var(--font-serif);
-    margin-bottom: 1.1em;
-}
-
-figure {
-    margin: 2.5rem auto; /* Center figures that are narrower than content width */
-    text-align: center;
-}
-
-figcaption {
-    font-family: var(--font-sans);
-    font-size: 0.9rem;
-    color: #666;
-    margin-top: 0.75em;
-    line-height: 1.4;
-}
-
-video, img {
-    max-width: 100%; /* Default for responsive images/videos within the column */
-    height: auto;
-    border-radius: 4px;
-    /* Optional subtle shadow, Distill is often flatter */
-    /* box-shadow: 0 2px 8px rgba(0,0,0,0.05); */
-    display: block; /* Helps with centering if margin auto is used on parent */
-    margin: 0 auto; /* Center within figure */
-}
-
-/* Full-width figures (optional) - needs JS to move out of column or careful CSS */
-.figure-full-width {
-    width: 100vw; /* Viewport width */
-    max-width: none; /* Override any max-width from parent */
-    position: relative;
-    left: 50%;
-    right: 50%;
-    margin-left: -50vw;
-    margin-right: -50vw;
-    /* Add padding if needed, or let the content inside handle it */
-}
-.figure-full-width img,
-.figure-full-width video {
-    /* Potentially no border-radius for full-width elements */
-}
-
-
-a {
-    color: var(--link-color);
-    text-decoration: none;
-    /* Optional: subtle underline for links in body text */
-    /* text-decoration: underline;
-    text-decoration-color: alpha(var(--link-color), 0.3);
-    text-decoration-thickness: 1px;
-    text-underline-offset: 2px; */
-}
-
-a:hover {
-    color: var(--link-hover-color);
-    text-decoration: underline;
-}
-
-code, pre {
-    font-family: var(--font-mono);
-    background-color: var(--code-background);
-    padding: 0.15em 0.4em;
-    border-radius: 3px;
-    font-size: 0.9em; /* Slightly smaller than body text */
+/* --- UPDATED: Video Comparison Slider Specifics --- */
+.comparison-container {
+    position: relative; /* Needed for absolute positioning of slider and top video */
+    width: 100%;
+    /* You might want to set a specific aspect ratio or max-height for videos */
+    /* e.g., aspect-ratio: 16 / 9; or max-height: 500px; */
+    overflow: hidden; /* Hide parts of the top video that go beyond its clipped width */
+    margin: 2rem auto; /* Center the container if it's narrower than content width */
     border: 1px solid var(--border-color);
+    border-radius: 4px;
 }
 
-pre {
-    padding: 0.8em 1em;
-    overflow-x: auto;
-    line-height: 1.45;
+/* NEW: Wrapper for videos and slider to handle positioning context */
+.video-wrapper {
+    position: relative;
+    width: 100%; /* Or match video aspect ratio if needed */
+    /* If videos have a specific aspect ratio, apply it here to size the wrapper */
+    /* e.g., aspect-ratio: 16 / 9; */ 
 }
 
-/* --- Interactive Comparison Specifics --- */
-.interactive-comparison {
-    /* Keep styles from before, ensure they fit within the content column */
-    margin: 2rem 0; /* Standard margin */
+.comparison-video-under,
+.comparison-video-over {
+    display: block;
+    width: 100%;
+    height: auto; /* Maintain aspect ratio */
+    border-radius: 4px; /* Match container if any rounding */
 }
-/* Ensure interactive elements don't overflow the main content column */
-.interactive-comparison .video-comparison-wrapper,
-.interactive-comparison .slider-container {
-    max-width: 100%;
+
+.comparison-video-over {
+    position: absolute;
+    top: 0;
+    left: 0;
+    /* clip-path will be controlled by JS */
+    clip-path: inset(0 50% 0 0); /* Initially show left 50% */
+    /* pointer-events: none; Optional: if it interferes with slider */
+}
+
+.comparison-slider {
+    position: absolute;
+    top: 0;
+    left: 50%; /* Initial position */
+    width: 4px; /* Width of the draggable slider handle */
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.7);
+    border-left: 1px solid rgba(0,0,0,0.3);
+    border-right: 1px solid rgba(0,0,0,0.3);
+    cursor: ew-resize; /* East-West resize cursor */
+    transform: translateX(-50%); /* Center the handle */
+    z-index: 10; /* Make sure it's on top */
+    /* For touch devices, you might need to increase its effective touch area */
+}
+/* Optional: Add a more visible handle to the slider bar */
+.comparison-slider::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 30px; /* Wider handle for easier grabbing */
+    height: 30px;
+    background-color: rgba(0, 0, 0, 0.5);
+    border: 2px solid white;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 0 5px rgba(0,0,0,0.3);
 }
 
 
-/* --- Footer --- */
-.main-content-column footer {
-    font-family: var(--font-sans);
-    text-align: center;
-    margin-top: 4rem;
-    padding-top: 2rem;
-    border-top: 1px solid var(--border-color);
-    font-size: 0.85rem;
-    color: #777;
+.comparison-container figcaption { /* If you put figcaption inside comparison-container */
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(0,0,0,0.5);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 3px;
+    font-size: 0.8em;
 }
 
-/* --- Responsive adjustments --- */
-@media (max-width: 1000px) { /* When TOC is hidden */
-    .page-container {
-        /* No longer flex, or adjust flex properties */
-        display: block; /* Or whatever makes sense for single column */
-        width: auto; /* Let it take natural width or set a mobile width like 95vw */
-        padding: 0 var(--base-padding); /* Padding on the sides of the page for mobile */
-    }
-    #table-of-contents {
-        display: none;
-    }
-    .main-content-column {
-        padding: var(--base-padding); /* Reset padding */
-        margin: 0 auto; /* Ensure centering */
-        max-width: min(var(--main-content-max-width), 95vw);
-    }
+/* Labels for Juxtapose (if you use it alongside, or adapt styling) */
+.jx-label {
+    font-family: var(--font-sans) !important; /* Force font if needed */
 }
 
-@media (max-width: 600px) { /* Further adjustments for small screens */
-    body {
-        font-size: 1rem;
-    }
-    .main-content-column header h1 {
-        font-size: 2rem;
-    }
-    .main-content-column .subtitle {
-        font-size: 1.1rem;
-    }
-    article h2 {
-        font-size: 1.5rem;
-    }
-    article h3 {
-        font-size: 1.25rem;
-    }
-    .main-content-column {
-        padding: 15px;
-    }
+/* --- Footer (Keep from previous version) --- */
+.main-content-column footer { font-family: var(--font-sans); text-align: center; margin-top: 4rem; padding-top: 2rem; border-top: 1px solid var(--border-color); font-size: 0.85rem; color: #777; }
+
+/* --- Responsive adjustments (Keep from previous version) --- */
+@media (max-width: 1000px) {
+    .page-container { display: block; width: auto; padding: 0 var(--base-padding); }
+    #table-of-contents { display: none; }
+    .main-content-column { padding: var(--base-padding); margin: 0 auto; max-width: min(var(--main-content-max-width), 95vw); }
+}
+@media (max-width: 600px) {
+    body { font-size: 1rem; }
+    .main-content-column header h1 { font-size: 2rem; }
+    .main-content-column .subtitle { font-size: 1.1rem; }
+    article h2 { font-size: 1.5rem; }
+    article h3 { font-size: 1.25rem; }
+    .main-content-column { padding: 15px; }
 }
