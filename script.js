@@ -208,6 +208,29 @@ document.addEventListener('DOMContentLoaded', () => {
     // if (typeof juxtapose !== 'undefined') {
     //     juxtapose.scan(); 
     // }
+
+    // --- Page Visibility API to handle video autoplay on tab focus ---
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') {
+            console.log("Page became visible. Checking autoplay videos...");
+            document.querySelectorAll('video[autoplay]').forEach(video => {
+                if (video.paused) {
+                    const videoIdentifier = video.id || video.src.split('/').pop(); // Get ID or filename
+                    console.log('Attempting to resume play for paused autoplay video:', videoIdentifier);
+                    video.play().catch(error => {
+                        // It's common for these to fail if not directly user-initiated after a long sleep,
+                        // but it's worth trying.
+                        console.warn('Failed to resume play for video on visibility change:', videoIdentifier, error.name, error.message);
+                    });
+                }
+            });
+        } else {
+            console.log("Page became hidden.");
+            // We could explicitly pause videos here, but since they are looped and muted,
+            // and the browser likely handles this, it might be best to leave them
+            // to default browser behavior on hidden.
+        }
+    });
 });
 
 // Global function for Juxtapose slider compatibility (if still using its HTML structure)
