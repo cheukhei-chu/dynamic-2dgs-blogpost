@@ -35,8 +35,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
     /* Treat clip‑path as broken on iOS */
     const clipPathSupported =
-          CSS.supports('clip-path: inset(0 50% 0 0)') ||
-          CSS.supports('-webkit-clip-path: inset(0 50% 0 0)');
+          CSS.supports('(clip-path: inset(0 50% 0 0))') ||
+          CSS.supports('(-webkit-clip-path: inset(0 50% 0 0))');
+    console.log('clipPathSupported=', clipPathSupported, 'iOS=', isIOS);
 
     const comparisonContainers = document.querySelectorAll('.comparison-container');
 
