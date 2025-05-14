@@ -93,7 +93,7 @@ pre { padding: 0.8em 1em; overflow-x: auto; line-height: 1.45; }
     left: 0;
     /* clip-path will be controlled by JS */
     clip-path: inset(0 50% 0 0); /* Initially show left 50% */
-    /* pointer-events: none; Optional: if it interferes with slider */
+    pointer-events: none; /* Optional: if it interferes with slider */
 }
 
 .comparison-slider {
@@ -135,7 +135,7 @@ figure.side-by-side-video-pair {
 .video-row {
     display: flex;
     justify-content: center; /* Center items */
-    align-items: flex-start; /* Align to top if heights differ */
+    align-items: baseline; /* Align to top if heights differ */
     gap: 2%; /* Defines a 2% gap (of parent width) between video elements */
     margin-bottom: 1em; /* Add some space below the row of videos, before the figcaption */
 }
