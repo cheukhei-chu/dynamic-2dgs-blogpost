@@ -146,12 +146,6 @@ pre { padding: 0.8em 1em; overflow-x: auto; line-height: 1.45; }
     box-shadow: 0 0 5px rgba(0,0,0,0.3);
 }
 
-/* Remove previous flex styling from figure.side-by-side-video-pair if it exists */
-figure.side-by-side-video-pair {
-    /* display: block; /* or whatever its default should be if not flex */
-    margin-bottom: 20px; /* Example margin for figures */
-}
-
 /* NEW: Styling for the video row within side-by-side figures */
 .video-row {
     display: flex;
@@ -297,4 +291,26 @@ figure video.vertical-video-constrained {
 .video-item video.vertical-video-constrained {
     /* width will be controlled by .video-item's flex-basis or width */
     /* max-height will apply */
+}
+
+/* CSS for the NEW Canvas-based Bear Comparison */
+#bear-compare video {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+}
+
+#bear-compare canvas {
+  width: 100%;
+  height: auto; /* Maintain aspect ratio based on width */
+  display: block; /* Remove extra space below canvas */
+  border-radius: 4px; /* Match border-radius of old .comparison-container */
+}
+/* END CSS for the NEW Canvas-based Bear Comparison */
+
+/* Remove previous flex styling from figure.side-by-side-video-pair if it exists */
+figure.side-by-side-video-pair {
+    /* display: block; /* or whatever its default should be if not flex */
+    margin-bottom: 20px; /* Example margin for figures */
 }

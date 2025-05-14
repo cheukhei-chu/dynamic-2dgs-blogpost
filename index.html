@@ -283,18 +283,16 @@
                     <section id="editing-demos">
                         <h3>4.4 Editing Demonstrations</h3>
                         <p>The improved object coherence from optical flow supervision enables more compelling and efficient editing applications. To achieve edits like the object recoloring showcased below for the <code>bear_39</code> video, we first apply the Segment Anything Model (SAM) over a user-defined bounding box containing the bear in a reference frame. SAM segments the bear, and we then identify the set of 2D Gaussians whose centers fall within this segmentation mask at that frame. This effectively filters the Gaussians representing the bear. Once these object-specific Gaussians are identified, their parameters (e.g., color) can be modified. Subsequent rendering of the edited video, now with the modified Gaussians, is extremely fast, taking less than 1 second for the entire clip, as it leverages the pre-optimized dynamic representation. The edit consistently follows the bear's motion due to the enhanced trajectory learning from the optical flow supervision.</p>
-                        <div class="comparison-container">
-                            <div class="video-wrapper">
-                                <video autoplay loop muted playsinline width="100%" class="comparison-video-under" id="bearPurpleColor">
-                                    <source src="videos/downstream/bear_39_bear_interior_recolored_to_0_0_0_0_1_0_w0_20_iter10000_optflow30000_pts249243b.mp4" type="video/mp4">
-                                </video>
-                                <div class="video-over-wrapper">
-                                    <video autoplay loop muted playsinline width="100%" class="comparison-video-over" id="bearOriginalColor">
-                                        <source src="videos/downstream/bear_39.mp4" type="video/mp4">
-                                    </video>
-                                </div>
-                                <div class="comparison-slider" data-for-container=".comparison-container:has(#bearOriginalColor)"></div>
-                            </div>
+                        <div class="comparison-container" id="bear-compare">
+                          <!-- hidden sources -->
+                          <video id="bearUnder"  muted loop playsinline src="videos/downstream/bear_39.mp4"></video>
+                          <video id="bearOver"   muted loop playsinline src="videos/downstream/bear_39_bear_interior_recolored_to_0_0_0_0_1_0_w0_20_iter10000_optflow30000_pts249243b.mp4"></video>
+                        
+                          <!-- visible surface -->
+                          <canvas></canvas>
+                        
+                          <!-- draggable handle -->
+                          <div class="comparison-slider"></div>
                         </div>
                         <figcaption style="text-align: center; margin-top: 0.75em; font-family: var(--font-sans); font-size: 0.9rem; color: #666; line-height: 1.4;">Fig 8: Interactive Comparison: Original bear (revealed left) vs. Bear recolored to purple (revealed right). Drag slider to compare.</figcaption>
                         <figure>
