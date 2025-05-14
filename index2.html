@@ -68,7 +68,7 @@
 
                 <section id="visualizing-dynamics"> <!-- NEW HOOK SECTION -->
                     <h2>2. Visualizing Learned Dynamics: The "Wave"</h2>
-                    <p>Before diving into our proposed solution, let's visualize the intriguing, albeit problematic, behavior of Gaussians trained with only a reconstruction objective. The videos below show the animated centers of all learned Gaussians for two different scenes: a boba tea cup moving across a table ("boba_69") and a person walking up stairs ("margulan_63"). While the rendered videos (not shown here, but see Fig. 5 later) accurately reconstruct the scenes, the motion of the individual Gaussian centers reveals a fascinating pattern.</p>
+                    <p>Initial analysis of Gaussian primitives trained solely with a reconstruction objective reveals characteristic motion patterns. The animations below (Figure 1) depict the trajectories of Gaussian centers for two distinct dynamic scenes: "boba_69" (a boba tea cup moving across a surface) and "margulan_63" (a person ascending stairs). While the rendered output of these baseline models achieves high fidelity in frame reconstruction (cf. Section 5.2), the underlying motion of individual Gaussian centers displays a notable phenomenon.</p>
                     <figure class="side-by-side-video-pair">
                         <div class="video-row video-row-layout-2">
                             <div class="video-item">
@@ -86,21 +86,21 @@
                         </div>
                         <figcaption>Fig 1: Animated Gaussian centers from baseline models (no optical flow loss). Left: "boba_69" scene. Right: "margulan_63" scene (person walking up stairs). Notice the localized, often oscillatory, motion of individual Gaussians creating a collective "wave" that forms the appearance of moving objects.</figcaption>
                     </figure>
-                    <p>This "wave effect," where apparent motion arises from the sequential activation of relatively static or locally oscillating primitives rather than true transport of a coherent group, is a central challenge we aim to address for robust object-level editing.</p>
+                    <p>This observed behavior, termed the 'wave effect,' describes how apparent object motion is often synthesized through the sequential activation of spatially localized or oscillating primitives, rather than the coherent, collective transport of a stable group of Gaussians. Such a mechanism presents a significant challenge for achieving robust object-level editing.</p>
                 </section>
 
                 <section id="background">
                     <h2>3. Background & Motivation</h2> <!-- Renumbered -->
                     <section id="dynamic-2dgs">
                         <h3>3.1 Dynamic 2D Gaussian Splatting</h3>
-                        <p>Our work builds upon 2D Gaussian Splatting... (Content from previous Fig 2 section)</p>
+                        <p>Our work builds upon the concept of 2D Gaussian Splatting, which represents visual information using a collection of 2D anisotropic Gaussian primitives. Each Gaussian \(G_i\) is defined by its 2D center position \(xy_i\), a 2D covariance matrix \(\Sigma_i\) (controlling its shape and orientation), an opacity \(\alpha_i\), and a color \(c_i\). For dynamic scenes (videos), these parameters, particularly position, covariance, and opacity, become functions of time \(t\): \(xy_i(t), \Sigma_i(t), \alpha_i(t)\). In our implementation, similar to recent dynamic Gaussian approaches, we model these time-varying parameters using B-splines. For instance, the x-coordinate of a Gaussian's center is given by \(x_i(t) = \sum_{k=0}^{K-1} N_{k,p}(t) \cdot CP_{i,x,k}\), where \(CP_{i,x,k}\) are learned control points and \(N_{k,p}(t)\) are B-spline basis functions of degree \(p\). The color \(c_i\) is typically kept static per Gaussian. Rendering a frame at time \(t\) involves projecting all active Gaussians onto the image plane and alpha-compositing their contributions. This explicit, differentiable representation allows for fast rendering and optimization via gradient descent.</p>
                     </section>
                     <section id="challenge-coherence">
                         <h3>3.2 The Coherence Challenge</h3> <!-- Content from previous Fig 2 section, but wave gif now Fig 3 -->
-                        <p>A primary challenge ... stadium wave or the propagation of sound (Fig. 2).</p>
+                        <p>A primary challenge when training such models solely with a pixel-wise reconstruction loss (e.g., L1 + MS-SSIM) is that the learned Gaussians often lack object-centric coherence. The optimization prioritizes matching the target frame at each instant, which can be achieved even if individual Gaussians do not consistently track semantic objects. Instead, a "wave effect" can emerge: the appearance of a moving object is formed by different, spatially localized Gaussians activating, deactivating, or subtly shifting over time, much like a stadium wave or the propagation of sound. This creates a convincing illusion of motion at the macroscopic level, but the underlying primitives may not possess persistent object identity or long-range, coherent trajectories.</p>
                         <figure>
                             <img src="videos/fallacy/Lwave-Red-2.gif" alt="Wave effect metaphor" style="max-width: 50%; height: auto; border: 1px solid var(--border-color);">
-                            <figcaption>Fig 2: The "wave effect" analogy...</figcaption>
+                            <figcaption>Fig 2: The "wave effect" analogy. Local elements (representing Gaussians) create an illusion of a propagating wave (apparent object motion) through sequential local activities, without any single element traversing the entire path.</figcaption>
                         </figure>
                         <p>This lack of true object tracking ... demonstrated in Figure 3 using our baseline model on the <code>boba_69</code> video.</p>
                          <figure>
@@ -112,8 +112,47 @@
                     </section>
                     <section id="literature-review">
                         <h3>3.3 Related Work</h3>
-                        <p>Recent advancements in neural scene representations... (Content from previous Fig 2 section)</p>
-                    </section>
+
+<p>
+Research on neural video representations has progressed along two main axes: <strong>(i)</strong> <em>implicit</em> coordinate‑based networks that output RGB values, and <strong>(ii)</strong> <em>explicit</em> primitive‑based models that render a set of parameterised elements (points, Gaussians, sprites) with a fast rasteriser.  We review each family in the context of <em>editability, compression, and temporal coherence</em>.
+</p>
+
+<!-- ----------  A. Implicit 2D neural representations  ---------- -->
+<h4 id="lit-inr">A&nbsp;&middot;&nbsp;Implicit 2‑D Neural Video Models</h4>
+<ul>
+  <li><strong>NeRV</strong> (Chen&nbsp;<em>et al.</em>, 2021) encodes an entire video in a CNN that takes the frame index as input&nbsp;[1].  It achieves high PSNR and &gt;500 FPS decoding, but editing is difficult because content is entangled in the network weights.</li>
+  <li><strong>E‑NeRV / C‑NeRV / H‑NeRV / FFNeRV</strong> (2022‑24) accelerate NeRV by factorising spatial‑temporal features or adding content‑adaptive embeddings [2 – 5].  Model size and training time are still proportional to video length, and object‑centric control remains limited.</li>
+  <li><strong>DS‑NeRV</strong> (2024) separates "static" and "dynamic" latent codes, hinting at objectness, but still lacks an explicit notion of per‑object primitives [6].</li>
+</ul>
+
+<!-- ----------  B. Dynamic 3‑D scene methods ---------- -->
+<h4 id="lit-3d">B&nbsp;&middot;&nbsp;Dynamic 3‑D Scene Representations</h4>
+<ul>
+  <li><strong>Dynamic NeRFs</strong> (D‑NeRF 2020, Nerfies / HyperNeRF 2021, K‑Planes 2023) learn a 4‑D radiance field that warps a canonical space over time [7‑9].  They excel at novel‑view synthesis but require long optimisation (&gt;24 h) and are hard to manipulate at object level.</li>
+  <li><strong>3‑D Gaussian Splatting (3DGS)</strong> (Kerbl <em>et al.</em>, 2023) replaces the NeRF field with tens of thousands of explicit anisotropic Gaussians, enabling 30–100 FPS real‑time novel‑view rendering [10].</li>
+  <li><strong>Dynamic 3D Gaussians</strong> (Luiten <em>et al.</em>, 2023) let each Gaussian translate and rotate under local‑rigidity priors, delivering joint 6‑DoF tracking and view synthesis from monocular video [11].  Follow‑ups such as GaussianVideo (2024) add neural ODE motion to improve smoothness [12].</li>
+  <li><strong>VGR / "Splatter a Video"</strong> (Sun <em>et al.</em>, 2024) lifts monocular footage into 3‑D Gaussians by distilling depth + flow priors, enabling object‑wise editing and stereo re‑rendering [13].</li>
+</ul>
+
+<!-- ----------  C. Static 2‑D Gaussian splats ---------- -->
+<h4 id="lit-img">C&nbsp;&middot;&nbsp;Static 2‑D Gaussian Splatting for Images</h4>
+<ul>
+  <li><strong>GaussianImage</strong> (Zhang <em>et al.</em>, ECCV 2024) shows that a single RGB image can be approximated by a few thousand 2‑D Gaussians and rendered at 1500–2000 FPS with negligible quality drop [14].  This work motivates extending splats to the temporal dimension.</li>
+</ul>
+
+<!-- ----------  D. Dynamic 2‑D Gaussian splats (state of the art) ---------- -->
+<h4 id="lit-2dvid">D&nbsp;&middot;&nbsp;Dynamic 2‑D Gaussian Splatting for Video</h4>
+<ul>
+  <li><strong>VeGaS</strong> (Smolak‑Dyżewska <em>et al.</em>, 2024) introduces <em>Folded‑Gaussian</em> distributions whose conditional slices yield the 2‑D Gaussians of each frame, capturing non‑linear motion and supporting realistic motion edits [15].</li>
+  <li><strong>GSVC</strong> (Wang <em>et al.</em>, Jan 2025) frames 2‑D splats as a predictive video codec: I‑frames are optimised from scratch, P‑frames reuse and refine the previous frame's Gaussians, with automatic pruning for bit‑rate control.  It matches AV1 / VVC rate‑distortion while decoding at 1500 FPS [16].</li>
+  <li><strong>D2GV</strong> (Liu <em>et al.</em>, Mar 2025) learns a <em>canonical</em> Gaussian set per GOP and a small MLP that deforms it over time, achieving 400 FPS decode and outperforming NeRV variants on UVG and MCL‑JCV benchmarks; it also demonstrates video interpolation, inpainting, and denoising [17].</li>
+</ul>
+
+<!-- ----------  E. Open gaps ---------- -->
+<h4 id="lit-gaps">E&nbsp;&middot;&nbsp;Gaps &amp; Opportunities</h4>
+<p>
+Despite rapid progress, current splatting methods lack <em>semantic grouping</em>; Gaussians are arranged for reconstruction but not tagged by object, hindering high‑level edits.  Long sequences can accumulate drift, and real‑time <em>encoding</em> (not just decoding) is still an open challenge.  Hybrid 2‑D/3‑D formulations that couple fast 2‑D splats with occasional 3‑D reasoning, and integrating language‑conditioned generative priors for appearance edits, are promising research directions.
+</p>
                 </section>
 
                 <section id="our-approach">
