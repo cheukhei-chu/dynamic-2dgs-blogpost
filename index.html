@@ -67,7 +67,7 @@
                 <p class="authors">Cheuk Hei Chu, Margulan Ismoldayev</p>
                 <p class="date">May 13, 2025</p>
                 <p class="repo-links" style="text-align: center; margin-top: 10px; font-family: var(--font-sans);">
-                    <a href="https://github.com/ismoldayev/dynamic-2dgs" target="_blank" rel="noopener noreferrer">[Code Repository]</a>
+                    <a href="https://github.com/ismoldayev/dynamic-2dgs" target="_blank" rel="noopener noreferrer">[Code]</a>
                 </p>
             </header>
 
@@ -75,19 +75,19 @@
               <div style="display: flex; justify-content: space-around; align-items: flex-start; flex-wrap: wrap;">
                 <div class="video-item" style="margin: 10px; flex: 1; min-width: 280px; max-width: 30%;">
                   <video autoplay loop muted playsinline controlslist="nodownload" style="width: 100%; height: auto; border: 1px solid var(--border-color);">
-                    <source src="videos/car_60_car_recolored_to_1_0_0_0_0_0_w0_60_iter10000_optflow100000_pts249244.MP4" type="video/mp4">
+                    <source src="videos/car_60_car_recolored_to_1_0_0_0_0_0_w0_60_iter10000_optflow100000_pts249244_h264.MP4" type="video/mp4">
                     Your browser does not support the video tag.
                   </video>
                 </div>
                 <div class="video-item" style="margin: 10px; flex: 1; min-width: 280px; max-width: 30%;">
                   <video autoplay loop muted playsinline controlslist="nodownload" style="width: 100%; height: auto; border: 1px solid var(--border-color);">
-                    <source src="videos/car_60_diag_rendered_car.MP4" type="video/mp4">
+                    <source src="videos/car_60_diag_rendered_car_h264.MP4" type="video/mp4">
                     Your browser does not support the video tag.
                   </video>
                 </div>
                 <div class="video-item" style="margin: 10px; flex: 1; min-width: 280px; max-width: 30%;">
                   <video autoplay loop muted playsinline controlslist="nodownload" style="width: 100%; height: auto; border: 1px solid var(--border-color);">
-                    <source src="videos/bear_82_bear_recolored_to_1_0_1_0_0_0_w0_20_iter10000_optflow100000_pts249244.MP4" type="video/mp4">
+                    <source src="videos/bear_82_bear_recolored_to_1_0_1_0_0_0_w0_20_iter10000_optflow100000_pts249244_h264.MP4" type="video/mp4">
                     Your browser does not support the video tag.
                   </video>
                 </div>
@@ -150,7 +150,7 @@
                                      <div class="video-item">
                                         <p class="video-label">"Walking Up Stairs" Centers (Baseline)</p>
                                         <video autoplay loop muted playsinline class="vertical-video-constrained">
-                                            <source src="videos/fun_results/margulan_63_centers_iter_10000.MP4" type="video/mp4">
+                                            <source src="videos/fun_results/margulan_63_centers_iter_10000_h264.MP4" type="video/mp4">
                                         </video>
                                     </div>
                                 </div>
@@ -337,7 +337,7 @@
                         <p>While optical flow supervision improves consistency, challenges remain, particularly for very long sequences or extremely complex motions where tracking can degrade. For instance, in a 20-frame <code>boba_20</code> clip where the cup is recolored purple, we observe that towards the end of its trajectory, some edges of the boba cup may lose their purple coloring as the initially labeled Gaussians struggle to perfectly maintain coverage and coherence over the extended motion (Fig. 11).</p>
                         <figure>
                              <video autoplay loop muted playsinline width="70%" class="vertical-video-constrained standalone-boba-video">
-                                <source src="videos/limitations/boba_20_boba_recolored_to_0_0_0_0_1_0_w0_30_iter10000_optflow100000.MP4" type="video/mp4">
+                                <source src="videos/limitations/boba_20_boba_recolored_to_0_0_0_0_1_0_w0_30_iter10000_optflow100000_h264.MP4" type="video/mp4">
                             </video>
                             <figcaption>Fig 11: Example of tracking/editing degradation: recolored boba cup (purple) showing some color bleed or loss of coverage at edges after extended motion in a 20-frame clip.</figcaption>
                         </figure>
