@@ -48,9 +48,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Initial setup if clip-path is NOT supported, use wrapper width
         if (!clipPathSupported) {
-            videoOverWrapper.style.width = '50%'; // Match initial clip-path implied state
-            videoOver.style.clipPath = 'none'; // Ensure video itself is not trying to clip
+            // videoOverWrapper.style.width = '50%'; // REMOVE/COMMENT OUT: No longer resizing wrapper
+            videoOver.style.clipPath = 'none'; // Ensure video itself is not trying to clip via clip-path
             videoOver.style.webkitClipPath = 'none';
+            videoOver.style.webkitMaskImage = 'linear-gradient(to right, black 50%, transparent 50%)';
+            videoOver.style.maskImage = 'linear-gradient(to right, black 50%, transparent 50%)';
         }
         
         // Sync playback and volume
@@ -91,7 +93,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 videoOver.style.clipPath = `inset(0 ${100 - percentage}% 0 0)`;
                 videoOver.style.webkitClipPath  = `inset(0 ${100 - percentage}% 0 0)`;
             } else {
-                videoOverWrapper.style.width = `${percentage}%`;
+                // videoOverWrapper.style.width = `${percentage}%`; // REMOVE/COMMENT OUT: No longer resizing wrapper
+                videoOver.style.webkitMaskImage = `linear-gradient(to right, black ${percentage}% , transparent ${percentage}%)`;
+                videoOver.style.maskImage = `linear-gradient(to right, black ${percentage}% , transparent ${percentage}%)`;
             }
             sliderElement.style.left = `${percentage}%`;
         }

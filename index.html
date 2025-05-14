@@ -154,7 +154,7 @@
                                         </video>
                                     </div>
                                 </div>
-                                <figcaption>Fig 1: Animated Gaussian centers from baseline models (no optical flow loss). Left: "boba_69" scene. Right: "margulan_63" scene (person walking up stairs). Notice the localized, often oscillatory, motion of individual Gaussians creating a collective "wave" that forms the appearance of moving objects.</figcaption>
+                                <figcaption>Fig 1: Animated Gaussian centers from baseline models (no optical flow loss). Left: <code>boba_69</code> scene. Right: <code>margulan_63</code> scene (person walking up stairs). Notice the localized, often oscillatory, motion of individual Gaussians creating a collective "wave" that forms the appearance of moving objects.</figcaption>
                             </figure>
                             <p>This observed behavior, which we will call the 'wave effect,' describes how apparent object motion is often synthesized through the sequential activation of spatially localized or oscillating primitives, rather than the coherent, collective transport of a stable group of Gaussians. Such a mechanism presents a significant challenge for achieving robust object-level editing.</p>
 
@@ -168,7 +168,7 @@
                             <video autoplay loop muted playsinline width="70%" class="vertical-video-constrained standalone-boba-video">
                                 <source src="videos/fallacy/boba_69_remove_iter10000b.mp4" type="video/mp4">
                             </video>
-                            <figcaption>Fig 3: Object removal attempt using the baseline model ('boba_69').</figcaption>
+                            <figcaption>Fig 3: Object removal attempt using the baseline model (<code>boba_69</code>).</figcaption>
                         </figure>
                     </section>
                 </section>
@@ -267,7 +267,7 @@
                                 <div class="video-item"><p class="video-label">Baseline (No Flow)</p><video autoplay loop muted playsinline><source src="videos/optical_flow/bear_39_centers_iter_10000_optflow0.mp4" type="video/mp4"></video></div>
                                 <div class="video-item"><p class="video-label">With Optical Flow</p><video autoplay loop muted playsinline><source src="videos/optical_flow/bear_39_centers_iter_10000_optflow10000.mp4" type="video/mp4"></video></div>
                             </div>
-                            <figcaption>Fig 6: Gaussian center tracks for "bear_39". Left: Baseline. Right: With Flow Loss.</figcaption>
+                            <figcaption>Fig 6: Gaussian center tracks for <code>bear_39</code>. Left: Baseline. Right: With Flow Loss.</figcaption>
                         </figure>
                         <div style="max-width: 500px; margin: 2.5rem auto;">
                             <figure class="side-by-side-video-pair">
@@ -318,14 +318,14 @@
                                 <div class="video-item">
                                     <p class="video-label">Original (1.5fps)</p>
                                     <video autoplay loop muted playsinline>
-                                        <source src="videos/optflow_interp/bear_39_1p5fps.mp4" type="video/mp4">
+                                        <source src="videos/optflow_interp/bear_39_1p5fps_h264.mp4" type="video/mp4; codecs=avc1.64001F">
                                         Your browser does not support the video tag.
                                     </video>
                                 </div>
                                 <div class="video-item">
                                     <p class="video-label">Interpolated (3fps)</p>
                                     <video autoplay loop muted playsinline>
-                                        <source src="videos/optflow_interp/bear_39_rendered_interpolated_iter_10000_3fps.mp4" type="video/mp4">
+                                        <source src="videos/optflow_interp/bear_39_rendered_interpolated_iter_10000_3fps_h264.mp4" type="video/mp4; codecs=avc1.64001F">
                                         Your browser does not support the video tag.
                                     </video>
                                 </div>
