@@ -52,11 +52,15 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // Initial setup based on the determined strategy
-        if (clipPathSupported) { // Use the new clipPathSupported flag
+        if (clipPathSupported) { // Desktop and good browsers
             videoOver.style.clipPath = 'inset(0 50% 0 0)';
             videoOver.style.webkitClipPath = 'inset(0 50% 0 0)';
-        } else {
+            // Ensure wrapper defers to CSS for full width
+            videoOverWrapper.style.width = ''; 
+            videoOverWrapper.style.right = ''; 
+        } else { // Fallback for iOS or browsers where clip-path on video is buggy
             videoOverWrapper.style.width = '50%';
+            videoOverWrapper.style.right = 'auto'; // Allow width to take effect
             videoOver.style.clipPath = 'none';
             videoOver.style.webkitClipPath = 'none';
         }
@@ -95,11 +99,13 @@ document.addEventListener('DOMContentLoaded', () => {
             let percentage = ((xPosition - containerRect.left) / containerRect.width) * 100;
             percentage = Math.max(0, Math.min(100, percentage)); // Clamp between 0 and 100
 
-            if (clipPathSupported) { // Use the new clipPathSupported flag
+            if (clipPathSupported) { // Desktop and good browsers
                 videoOver.style.clipPath = `inset(0 ${100 - percentage}% 0 0)`;
                 videoOver.style.webkitClipPath  = `inset(0 ${100 - percentage}% 0 0)`;
-            } else {
+                // Ensure wrapper defers to CSS (no specific action needed here for update if already full via CSS)
+            } else { // Fallback for iOS
                 videoOverWrapper.style.width = `${percentage}%`;
+                videoOverWrapper.style.right = 'auto'; // Ensure right remains auto for width to apply
             }
             sliderElement.style.left = `${percentage}%`;
         }
