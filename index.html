@@ -26,14 +26,14 @@
                   <li><a href="#literature-review">1.3 Related Work</a></li>
                 </ul>
               </li>
-          
+
               <li><a href="#problem-statement">2. Problem Statement & Challenges</a>
                 <ul>
                   <li><a href="#dynamic-2dgs">2.1 Dynamic 2D Gaussian Splatting</a></li>
                   <li><a href="#challenge-coherence">2.2 The Coherence Challenge</a></li>
                 </ul>
               </li>
-          
+
               <li><a href="#our-approach">3. Our Approach: Optical Flow Supervision</a>
                 <ul>
                   <li><a href="#baseline-model-details">3.1 Baseline Dynamic 2D Gaussian Model</a></li>
@@ -41,7 +41,7 @@
                   <li><a href="#optical-flow-integration">3.3 Integrating Optical Flow Loss</a></li>
                 </ul>
               </li>
-          
+
               <li><a href="#experiments-results">4. Experiments & Results</a>
                 <ul>
                   <li><a href="#setup">4.1 Experimental Setup</a></li>
@@ -52,7 +52,7 @@
                   <li><a href="#limitations-failures">4.6 Limitations & Failure Cases</a></li>
                 </ul>
               </li>
-          
+
               <li><a href="#discussion">5. Discussion</a></li>
               <li><a href="#conclusion">6. Conclusion & Future Work</a></li>
               <li><a href="#references">7. References</a></li>
@@ -93,14 +93,14 @@
             <article>
                 <section id="introduction">
                     <h2>1. Introduction</h2>
-                  
+
                     <!-- 1.1 -------------------------------------------------------- -->
                     <section id="motivation">
                       <h3>1.1 Motivation</h3>
                    <p>Recent advances in neural rendering, particularly 3D Gaussian Splatting (3DGS) (Kerbl et al., 2023), have enabled high-fidelity, real-time rendering of static scenes. The extension to Dynamic 3D Gaussians (Luiten et al., 2023) further allows for the modeling of complex dynamic 3D scenes, capturing motion and enabling novel-view synthesis over time along with dense 6-DOF tracking. While powerful, these methods explicitly model the full 3D scene structure, which can be computationally intensive and potentially overkill for applications focused solely on analyzing or manipulating video content from the original viewpoints.</p>
                    <p>Concurrently, the efficiency of using 2D Gaussians for static image representation and compression has been demonstrated by GaussianImage (Zhang et al., 2024), which achieves extremely fast rendering speeds by representing images as collections of optimized 2D Gaussian primitives. This motivates the question of whether dynamic 2D Gaussian representation can effectively model video sequences, capturing complex motion and temporal coherence, and as such enabling basic video analysis while offering significant efficiency advantages over 3D dynamic modeling. In this project, we propose Flowing Gaussians, a method of representing a video using dynamic 2D Gaussians, supervised by optical flow, that allows all sorts of efficient object-based downstream video editing tasks. </p>
                </section>
-                  
+
                     <!-- 1.2 -------------------------------------------------------- -->
                     <section id="overview">
                       <h3>1.2 Overview</h3>
@@ -109,7 +109,7 @@
                    <p>At the heart of Flowing Gaussians are two key design decisions aimed at enhancing both the representational power and training efficiency for dynamic scenes. Firstly, diverging from simpler trajectory models such as in VeGaS (Smolak-Dyżewska et al., 2024), we leverage B-splines to model the temporal evolution of individual Gaussian parameters (such as position and shape). Secondly, to ensure these dynamic Gaussians accurately track objects through complex movements and interactions, we integrate optical flow as an explicit guiding signal during training. These decisions will be explained in depth and illustrated using video examples in order in Sections 3 and 4.</p>
                    <p>In this post, we will detail the architecture of our optical flow-guided dynamic 2D Gaussian Splatting method, elaborating on design decisions, and demonstrating its efficacy in video reconstruction and object tracking in Sections 3 and 4. Finally, we will showcase its application in downstream video editing tasks, highlighting the efficiency gained by our one-shot segmentation approach for persistent object editing.</p>
                </section>
-                  
+
                     <!-- 1.3 -------------------------------------------------------- -->
                     <section id="literature-review">
                       <h3>1.3 Related Work</h3>
@@ -122,11 +122,11 @@
                       </ul>
                     </section>
                   </section>
-                   
+
                 <section id="problem-statement">
                     <h2>2. Problem Statement & Challenges</h2>
 
-                    
+
 
                     <section id="dynamic-2dgs">
                         <h3>2.1 Dynamic 2D Gaussian Splatting</h3>
@@ -153,7 +153,7 @@
                                 <figcaption>Fig 1: Animated Gaussian centers from baseline models (no optical flow loss). Left: "boba_69" scene. Right: "margulan_63" scene (person walking up stairs). Notice the localized, often oscillatory, motion of individual Gaussians creating a collective "wave" that forms the appearance of moving objects.</figcaption>
                             </figure>
                             <p>This observed behavior, which we will call the 'wave effect,' describes how apparent object motion is often synthesized through the sequential activation of spatially localized or oscillating primitives, rather than the coherent, collective transport of a stable group of Gaussians. Such a mechanism presents a significant challenge for achieving robust object-level editing.</p>
-                        
+
                         <p>A primary challenge when training such models solely with a pixel-wise reconstruction loss (e.g., L1 + MS-SSIM) is that the learned Gaussians often lack object-centric coherence. The optimization prioritizes matching the target frame at each instant, which can be achieved even if individual Gaussians do not consistently track semantic objects. Instead, a "wave effect" can emerge: the appearance of a moving object is formed by different, spatially localized Gaussians activating, deactivating, or subtly shifting over time, much like a stadium wave or the propagation of sound. This creates a convincing illusion of motion at the macroscopic level, but the underlying primitives may not possess persistent object identity or long-range, coherent trajectories.</p>
                         <figure>
                             <img src="videos/fallacy/Lwave-Red-2.gif" alt="Wave effect metaphor" style="max-width: 50%; height: auto; border: 1px solid var(--border-color);">
@@ -179,8 +179,8 @@
                         <p>The model is trained by minimizing a reconstruction loss between the rendered frames \(\hat{I}(t)\) and ground truth frames \(I_{\text{gt}}(t)\), typically a combination of L1 and MS-SSIM (our "Fusion4" loss):</p>
                         <p>\[ \mathcal{L}_{\text{recon}} = \sum_{t} \left( \lambda_{\text{L1}} \|\hat{I}(t) - I_{\text{gt}}(t)\|_1 + (1-\lambda_{\text{L1}})(1 - \text{MS-SSIM}(\hat{I}(t), I_{\text{gt}}(t))) \right) \]</p>
                     </section>
-                    <section id="wave-effect-analysis-detailed"> 
-                        <h3>3.2 Deeper Dive: The "Wave Effect"</h3> 
+                    <section id="wave-effect-analysis-detailed">
+                        <h3>3.2 Deeper Dive: The "Wave Effect"</h3>
                         <p>To understand the baseline's limitations in learning coherent object motion, we conducted diagnostic experiments. One such experiment involved rendering only those Gaussians whose initial positions (\(t=0\)) were on the right half of the screen for the <code>boba_69</code> video (where the boba cup moves from right to left). As seen in Figure 4, these Gaussians largely exhibit local, oscillatory motion and fail to translate coherently with the boba cup across the frame. This supports our "wave effect" hypothesis: apparent motion is achieved by local activations rather than consistent transport of object-specific primitives.</p>
                         <figure>
                             <div class="video-row video-row-layout-2">
@@ -242,7 +242,7 @@
                                 <div class="video-item"><p class="video-label">With Optical Flow</p><video autoplay loop muted playsinline><source src="videos/optical_flow/bear_39_centers_iter_10000_optflow10000.mp4" type="video/mp4"></video></div>
                             </div>
                             <figcaption>Fig 6: Gaussian center tracks for "bear_39". Left: Baseline. Right: With Flow Loss.</figcaption>
-                        </figure> 
+                        </figure>
                         <figure class="side-by-side-video-pair">
                             <div class="video-row video-row-layout-2">
                                  <div class="video-item"><p class="video-label">Baseline (No Flow)</p><video autoplay loop muted playsinline class="vertical-video-constrained"><source src="videos/optical_flow/boba_40_centers_iter_10000_optflow0.mp4" type="video/mp4"></video></div>
@@ -310,6 +310,7 @@
                         <li>Park, K., Sinha, U., Barron, J. T., Bouaziz, S., Goldman, D. B., Seitz, S. M., and Martin-Brualla, R. Nerfies: Deformable neural radiance fields, 2021. URL <a href="https://arxiv.org/abs/2011.12948">https://arxiv.org/abs/2011.12948</a>.</li>
                         <li>Pumarola, A., Corona, E., Pons-Moll, G., and Moreno-Noguer, F. D-nerf: Neural radiance fields for dynamic scenes, 2020. URL <a href="https://arxiv.org/abs/2011.13961">https://arxiv.org/abs/2011.13961</a>.</li>
                         <li>Zhang, X., Ge, X., Xu, T., He, D., Wang, Y., Qin, H., Lu, G., Geng, J., and Zhang, J. Gaussianimage: 1000 fps image representation and compression by 2d gaussian splatting, 2024. URL <a href="https://arxiv.org/abs/2403.08551">https://arxiv.org/abs/2403.08551</a>.</li>
+                        <li>Smolak-Dyżewska, W., Malarz, D., Howil, K., Kaczmarczyk, J., Mazur, M., & Spurek, P. VeGaS: Video Gaussian Splatting, 2024. URL <a href="https://arxiv.org/abs/2411.11024">https://arxiv.org/abs/2411.11024</a>.</li>
                     </ol>
                 </section>
                 <footer>
