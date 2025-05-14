@@ -83,7 +83,6 @@
                          <figure>
                             <video controls autoplay loop muted playsinline width="70%" class="vertical-video-constrained">
                                 <source src="videos/fallacy/boba_69_remove_iter10000.MP4" type="video/mp4">
-                                Your browser does not support the video tag.
                             </video>
                             <figcaption>Fig 3: Object removal attempt using the baseline model (no optical flow loss) on the 'boba_69' video. The void from the removed boba cup remains largely static in its initial position, while the rendered cup moves away.</figcaption>
                         </figure>
@@ -172,14 +171,14 @@
                         <p>Visualizing Gaussian center trajectories clearly illustrates the impact of optical flow. In the baseline, Gaussians exhibit localized, oscillatory motion. With flow supervision, they learn more coherent, long-range transport paths that better align with object movement.</p>
                         <figure class="side-by-side-video-pair">
                             <figcaption>Fig 6: Gaussian center tracks for the "bear\_39" scene. Left: Baseline (No Flow). Right: With Optical Flow Loss.</figcaption>
-                            <div class.video-row">
+                            <div class="video-row video-row-layout-2">
                                 <div class="video-item"><p class="video-label">Baseline (No Flow)</p><video autoplay loop muted playsinline><source src="videos/optical_flow/bear_39_centers_iter_10000_optflow0.mp4" type="video/mp4"></video></div>
                                 <div class="video-item"><p class="video-label">With Optical Flow</p><video autoplay loop muted playsinline><source src="videos/optical_flow/bear_39_centers_iter_10000_optflow10000.mp4" type="video/mp4"></video></div>
                             </div>
                         </figure>
                         <figure class="side-by-side-video-pair">
                             <figcaption>Fig 7: Gaussian center tracks for the "boba" scene (using `boba_40` for consistency if these are your best examples, or update to `boba_69` if you have those videos).</figcaption>
-                            <div class="video-row">
+                            <div class="video-row video-row-layout-2">
                                  <div class="video-item"><p class="video-label">Baseline (No Flow)</p><video autoplay loop muted playsinline><source src="videos/optical_flow/boba_40_centers_iter_10000_optflow0.mp4" type="video/mp4"></video></div>
                                 <div class="video-item"><p class="video-label">With Optical Flow</p><video autoplay loop muted playsinline><source src="videos/optical_flow/boba_40_centers_iter_10000_optflow100000.mp4" type="video/mp4"></video></div>
                             </div>
