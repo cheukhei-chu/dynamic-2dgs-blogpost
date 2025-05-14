@@ -114,7 +114,7 @@
                         </figure>
                         <p>This lack of true object tracking ... demonstrated in Figure 3 using our baseline model on the <code>boba_69</code> video.</p>
                          <figure>
-                            <video controls autoplay loop muted playsinline width="70%" class="vertical-video-constrained standalone-boba-video">
+                            <video autoplay loop muted playsinline width="70%" class="vertical-video-constrained standalone-boba-video">
                                 <source src="videos/fallacy/boba_69_remove_iter10000b.mp4" type="video/mp4">
                             </video>
                             <figcaption>Fig 3: Object removal attempt using the baseline model ('boba_69')...</figcaption>
@@ -280,7 +280,7 @@ Despite rapid progress, current splatting methods lack <em>semantic grouping</em
                         <h3>5.6 Limitations & Failure Cases</h3>
                         <p>While optical flow supervision improves consistency, challenges remain, particularly for very long sequences or extremely complex motions where tracking can degrade. For instance, in a 20-frame "boba" clip where the cup is recolored purple, we observe that towards the end of its trajectory, some edges of the boba cup may lose their purple coloring as the initially labeled Gaussians struggle to perfectly maintain coverage and coherence over the extended motion (Fig. 10).</p>
                         <figure>
-                             <video controls autoplay loop muted playsinline width="70%" class="vertical-video-constrained standalone-boba-video">
+                             <video autoplay loop muted playsinline width="70%" class="vertical-video-constrained standalone-boba-video">
                                 <source src="videos/limitations/boba_20_boba_recolored_to_0_0_0_0_1_0_w0_30_iter10000_optflow100000.MP4" type="video/mp4">
                             </video>
                             <figcaption>Fig 10: Example of tracking/editing degradation: recolored boba cup (purple) showing some color bleed or loss of coverage at edges after extended motion in a 20-frame clip.</figcaption>
