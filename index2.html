@@ -137,8 +137,14 @@
                 <section id="problem-statement">
                     <h2>2. Problem Statement & Challenges</h2>
 
-                    <section id="visualizing-dynamics-content">
-                        <h3>Visualizing Learned Dynamics: The "Wave"</h3>
+                        
+
+                    <section id="dynamic-2dgs">
+                        <h3>2.1 Dynamic 2D Gaussian Splatting</h3>
+                        <p>Our work builds upon the concept of 2D Gaussian Splatting, which represents visual information using a collection of 2D anisotropic Gaussian primitives. Each Gaussian \(G_i\) is defined by its 2D center position \(xy_i\), a 2D covariance matrix \(\Sigma_i\) (controlling its shape and orientation), an opacity \(\alpha_i\), and a color \(c_i\). For dynamic scenes (videos), these parameters, particularly position, covariance, and opacity, become functions of time \(t\): \(xy_i(t), \Sigma_i(t), \alpha_i(t)\). In our implementation, similar to recent dynamic Gaussian approaches, we model these time-varying parameters using B-splines. For instance, the x-coordinate of a Gaussian's center is given by \(x_i(t) = \sum_{k=0}^{K-1} N_{k,p}(t) \cdot CP_{i,x,k}\), where \(CP_{i,x,k}\) are learned control points and \(N_{k,p}(t)\) are B-spline basis functions of degree \(p\). The color \(c_i\) is typically kept static per Gaussian. Rendering a frame at time \(t\) involves projecting all active Gaussians onto the image plane and alpha-compositing their contributions. This explicit, differentiable representation allows for fast rendering and optimization via gradient descent.</p>
+                    </section>
+                    <section id="challenge-coherence">
+                        <h3>2.2 The Coherence Challenge</h3>
                         <p>Initial analysis of Gaussian primitives trained solely with a reconstruction objective reveals characteristic motion patterns. The animations below (Figure 1) depict the trajectories of Gaussian centers for two distinct dynamic scenes: "boba_69" (a boba tea cup moving across a surface) and "margulan_63" (a person ascending stairs). While the rendered output of these baseline models achieves high fidelity in frame reconstruction (cf. Section 4.2), the underlying motion of individual Gaussian centers displays a notable phenomenon.</p>
                         <figure class="side-by-side-video-pair">
                             <div class="video-row video-row-layout-2">
@@ -158,14 +164,7 @@
                             <figcaption>Fig 1: Animated Gaussian centers from baseline models (no optical flow loss). Left: "boba_69" scene. Right: "margulan_63" scene (person walking up stairs). Notice the localized, often oscillatory, motion of individual Gaussians creating a collective "wave" that forms the appearance of moving objects.</figcaption>
                         </figure>
                         <p>This observed behavior, which we will call the 'wave effect,' describes how apparent object motion is often synthesized through the sequential activation of spatially localized or oscillating primitives, rather than the coherent, collective transport of a stable group of Gaussians. Such a mechanism presents a significant challenge for achieving robust object-level editing.</p>
-                    </section>
-
-                    <section id="dynamic-2dgs">
-                        <h3>2.1 Dynamic 2D Gaussian Splatting</h3>
-                        <p>Our work builds upon the concept of 2D Gaussian Splatting, which represents visual information using a collection of 2D anisotropic Gaussian primitives. Each Gaussian \(G_i\) is defined by its 2D center position \(xy_i\), a 2D covariance matrix \(\Sigma_i\) (controlling its shape and orientation), an opacity \(\alpha_i\), and a color \(c_i\). For dynamic scenes (videos), these parameters, particularly position, covariance, and opacity, become functions of time \(t\): \(xy_i(t), \Sigma_i(t), \alpha_i(t)\). In our implementation, similar to recent dynamic Gaussian approaches, we model these time-varying parameters using B-splines. For instance, the x-coordinate of a Gaussian's center is given by \(x_i(t) = \sum_{k=0}^{K-1} N_{k,p}(t) \cdot CP_{i,x,k}\), where \(CP_{i,x,k}\) are learned control points and \(N_{k,p}(t)\) are B-spline basis functions of degree \(p\). The color \(c_i\) is typically kept static per Gaussian. Rendering a frame at time \(t\) involves projecting all active Gaussians onto the image plane and alpha-compositing their contributions. This explicit, differentiable representation allows for fast rendering and optimization via gradient descent.</p>
-                    </section>
-                    <section id="challenge-coherence">
-                        <h3>2.2 The Coherence Challenge</h3>
+                    
                         <p>A primary challenge when training such models solely with a pixel-wise reconstruction loss (e.g., L1 + MS-SSIM) is that the learned Gaussians often lack object-centric coherence. The optimization prioritizes matching the target frame at each instant, which can be achieved even if individual Gaussians do not consistently track semantic objects. Instead, a "wave effect" can emerge: the appearance of a moving object is formed by different, spatially localized Gaussians activating, deactivating, or subtly shifting over time, much like a stadium wave or the propagation of sound. This creates a convincing illusion of motion at the macroscopic level, but the underlying primitives may not possess persistent object identity or long-range, coherent trajectories.</p>
                         <figure>
                             <img src="videos/fallacy/Lwave-Red-2.gif" alt="Wave effect metaphor" style="max-width: 50%; height: auto; border: 1px solid var(--border-color);">
