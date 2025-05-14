@@ -174,9 +174,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const videoLeft = videoItems[0];
             const videoRight = videoItems[1];
 
-            // Autoplay videos (since they are muted and loop)
-            videoLeft.play().catch(error => console.error("Error attempting to autoplay videoLeft:", error, videoLeft.src));
-            videoRight.play().catch(error => console.error("Error attempting to autoplay videoRight:", error, videoRight.src));
+            // Videos will attempt to play due to 'autoplay' attribute in HTML.
+            // The Page Visibility API handler will attempt to resume them if paused on focus.
 
             // Sync playback time (master: videoLeft, slave: videoRight)
             videoLeft.addEventListener('timeupdate', () => {
