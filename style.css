@@ -228,3 +228,23 @@ figure.side-by-side-video-pair {
     article h3 { font-size: 1.25rem; }
     .main-content-column { padding: 15px; }
 }
+
+/* NEW class for controlling height of tall/vertical videos */
+.vertical-video-constrained {
+    max-height: 450px; /* Adjust this value as needed */
+    width: auto; /* Allow width to adjust to maintain aspect ratio */
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Ensure existing video styles don't conflict too much */
+figure video.vertical-video-constrained {
+    max-width: 100%; /* Still respect parent width */
+}
+
+/* If used within a video-item in a video-row */
+.video-item video.vertical-video-constrained {
+    /* width will be controlled by .video-item's flex-basis or width */
+    /* max-height will apply */
+}

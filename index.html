@@ -86,10 +86,10 @@
                         <p>Equation for model-implied flow: \(v_{\text{model},i}(t) = xy_i(t+dt) - xy_i(t)\)</p>
                         <p>Equation for optical flow loss: \(L_{\text{flow}} = \sum_t \sum_i w_i \cdot \|v_{\text{model},i}(t) - v_{\text{gt},i}(t)\|^2\)</p>
                         <p>Total Loss: \(L_{\text{total}} = L_{\text{recon}} + \lambda_{\text{flow}} \cdot L_{\text{flow}}\)</p>
-                        <figure>
+                    <figure>
                             <img src="images/flow_loss_diagram.png" alt="Optical Flow Loss Diagram" style="max-width: 80%; height: auto;">
                             <figcaption>Fig. X: Conceptual diagram of applying optical flow loss to Gaussian motion.</figcaption>
-                        </figure>
+                    </figure>
                     </section>
                 </section>
 
@@ -122,13 +122,13 @@
                     <section id="wave-effect">
                         <h2>4.2 The 'Wave' Effect: Apparent Motion from Local Gaussian Activity</h2>
                         <p>A common pitfall in optimizing dynamic explicit representations like Gaussian splatting solely for reconstruction is the emergence of what we term the "wave effect." Instead of a consistent set of Gaussians tracking an object, the appearance of motion can be achieved by different, spatially localized Gaussians activating and deactivating over time, much like a stadium wave. This creates an illusion of movement without true object coherence, hindering editing tasks. The following animation illustrates this concept metaphorically.</p>
-                        <figure>
+                    <figure>
                             <img src="videos/fallacy/Lwave-Red-2.gif" alt="Wave effect metaphor: air molecules creating a wave" style="max-width: 60%; height: auto; border: 1px solid var(--border-color);">
                             <figcaption>Fig. X: Metaphorical illustration of the 'wave effect'. Local elements (like air molecules or Gaussians) oscillate or activate sequentially, creating a propagating wave pattern, distinct from the collective, rigid movement of a defined object.</figcaption>
-                        </figure>
+                    </figure>
 
                         <p>We observe this phenomenon in our baseline model for the <code>boba_69</code> experiment. The videos below show Gaussian centers and their rendered output when trained without explicit motion guidance.</p>
-                        <figure>
+                    <figure>
                             <div class="video-row video-row-layout-2">
                                 <div class="video-item">
                                     <p class="video-label">Gaussian Centers (Baseline)</p>
@@ -142,11 +142,11 @@
                                     <video autoplay loop muted playsinline>
                                         <source src="videos/fallacy/boba_69_rendered_original_only_iter_10000_fast.mp4" type="video/mp4">
                                         Your browser does not support the video tag.
-                                    </video>
+                        </video>
                                 </div>
                             </div>
                             <figcaption>Fig. Y: Baseline <code>boba_69</code> scene: Gaussian centers (left) and corresponding rendered output (right). Note the local activity rather than cohesive object motion.</figcaption>
-                        </figure>
+                    </figure>
 
                         <p>Further diagnostic experiments highlight this. When Gaussians are initialized only in one region (e.g., the right half of the scene), they tend to remain localized or exhibit oscillatory behavior to reconstruct appearances, rather than translating coherently with perceived objects. This ultimately impacts tasks like object removal, where the "void" left by a removed object may not track the object's true path.</p>
                         <figure>
@@ -201,8 +201,8 @@
                                 </video>
                                 <video loop muted playsinline width="48%" style="display: inline-block;" class="video-right">
                                     <source src="videos/optical_flow/boba_40_centers_iter_10000_optflow100000.mp4" type="video/mp4">
-                                </video>
-                            </div>
+                            </video>
+                        </div>
                             <!-- <div class="sync-controls" style="text-align: center; margin-top: 10px;">
                                 <button class="play-pause-pair-btn">Play Boba Comparison</button>
                             </div> -->
@@ -236,7 +236,7 @@
                                     <source src="videos/downstream/bear_39.mp4" type="video/mp4">
                                 </video>
                                 <div class="comparison-slider"></div>
-                            </div>
+                        </div>
                             <figcaption>Fig. X: Interactive Video Slider: Original Bear (left) vs. Recolored Bear (right). (Drag the slider!)</figcaption>
                         </div>
                     </section>
