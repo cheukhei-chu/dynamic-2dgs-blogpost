@@ -32,9 +32,11 @@ document.addEventListener('DOMContentLoaded', () => {
     setTimeout(updateActiveTocLink, 100); // Initial check
 
     // --- Video Comparison Slider Logic ---
-    const isIOS = /iP(ad|hone|od)/.test(navigator.userAgent);
-    const actualClipPathSupport = CSS.supports('clip-path', 'inset(0 50% 0 0)') || CSS.supports('-webkit-clip-path', 'inset(0 50% 0 0)');
-    const useClipPathStrategy = !isIOS && actualClipPathSupport;
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+    /* Treat clip‑path as broken on iOS */
+    const clipPathSupported =
+          !isIOS && (CSS.supports('clip-path','inset(0 50% 0 0)') ||
+                     CSS.supports('-webkit-clip-path','inset(0 50% 0 0)'));
 
     const comparisonContainers = document.querySelectorAll('.comparison-container');
 
@@ -50,11 +52,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // Initial setup based on the determined strategy
-        if (useClipPathStrategy) {
+        if (clipPathSupported) { // Use the new clipPathSupported flag
             videoOver.style.clipPath = 'inset(0 50% 0 0)';
             videoOver.style.webkitClipPath = 'inset(0 50% 0 0)';
-            // Ensure wrapper doesn't interfere if clip-path is used on video
-            // videoOverWrapper.style.width = '100%'; // Not strictly needed due to inset:0 on wrapper
         } else {
             videoOverWrapper.style.width = '50%';
             videoOver.style.clipPath = 'none';
@@ -95,7 +95,7 @@ document.addEventListener('DOMContentLoaded', () => {
             let percentage = ((xPosition - containerRect.left) / containerRect.width) * 100;
             percentage = Math.max(0, Math.min(100, percentage)); // Clamp between 0 and 100
 
-            if (useClipPathStrategy) {
+            if (clipPathSupported) { // Use the new clipPathSupported flag
                 videoOver.style.clipPath = `inset(0 ${100 - percentage}% 0 0)`;
                 videoOver.style.webkitClipPath  = `inset(0 ${100 - percentage}% 0 0)`;
             } else {
