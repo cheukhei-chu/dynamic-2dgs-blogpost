@@ -59,6 +59,19 @@ a:hover { color: var(--link-hover-color); text-decoration: underline; }
 code, pre { font-family: var(--font-mono); background-color: var(--code-background); padding: 0.15em 0.4em; border-radius: 3px; font-size: 0.9em; border: 1px solid var(--border-color); }
 pre { padding: 0.8em 1em; overflow-x: auto; line-height: 1.45; }
 
+/* Default styles for specific figures */
+.figure-fig2 img {
+    max-width: 50%;
+    height: auto;
+    border: 1px solid var(--border-color);
+}
+
+.figure-graph1 img {
+    max-width: 60%;
+    height: auto;
+    border: 1px solid var(--border-color);
+}
+
 /* --- UPDATED: Video Comparison Slider Specifics --- */
 .comparison-container {
     position: relative; /* Needed for absolute positioning of slider and top video */
@@ -93,7 +106,8 @@ pre { padding: 0.8em 1em; overflow-x: auto; line-height: 1.45; }
     left: 0;
     /* clip-path will be controlled by JS */
     clip-path: inset(0 50% 0 0); /* Initially show left 50% */
-    pointer-events: none; /* Optional: if it interferes with slider */
+    -webkit-clip-path: inset(0 50% 0 0);
+    /* pointer-events: none; Optional: if it interferes with slider */
 }
 
 .comparison-slider {
@@ -135,7 +149,7 @@ figure.side-by-side-video-pair {
 .video-row {
     display: flex;
     justify-content: center; /* Center items */
-    align-items: baseline; /* Align to top if heights differ */
+    align-items: flex-start; /* Align to top if heights differ */
     gap: 2%; /* Defines a 2% gap (of parent width) between video elements */
     margin-bottom: 1em; /* Add some space below the row of videos, before the figcaption */
 }
@@ -154,6 +168,8 @@ figure.side-by-side-video-pair {
     margin-bottom: 0.3em;
     text-align: center;
     font-weight: 600;
+    min-height: 2.2em;        /* one\u2011liners and two\u2011liners occupy identical space   */
+    display: block;            /* makes sure the height applies even if it wraps    */
 }
 
 .video-item { /* New class to wrap video and its label */
@@ -248,6 +264,21 @@ figure.side-by-side-video-pair {
     article h2 { font-size: 1.5rem; }
     article h3 { font-size: 1.25rem; }
     .main-content-column { padding: 15px; }
+
+    .figure-fig2 img,
+    .figure-graph1 img {
+        max-width: 95%; /* Make these images larger on mobile */
+    }
+}
+
+@media (max-width: 500px){
+  .video-row{
+    flex-direction: column;      /* stack instead of side\u2011by\u2011side           */
+    gap: 1rem;                   /* a little breathing room between videos  */
+  }
+  .video-row .video-item{
+    width: 100%;                 /* full width in the column layout         */
+  }
 }
 
 /* Ensure existing video styles don't conflict too much */

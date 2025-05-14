@@ -79,6 +79,7 @@ document.addEventListener('DOMContentLoaded', () => {
             percentage = Math.max(0, Math.min(100, percentage)); // Clamp between 0 and 100
 
             videoOver.style.clipPath = `inset(0 ${100 - percentage}% 0 0)`;
+            videoOver.style.webkitClipPath  = `inset(0 ${100 - percentage}% 0 0)`;  // Safari mobile
             sliderElement.style.left = `${percentage}%`;
         }
 

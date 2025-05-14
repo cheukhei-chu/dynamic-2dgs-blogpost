@@ -144,7 +144,7 @@
                                     <div class="video-item">
                                         <p class="video-label">Boba Cup Centers (Baseline)</p>
                                         <video autoplay loop muted playsinline class="vertical-video-constrained">
-                                            <source src="videos/fallacy/boba_69_centers_iter_10000_fast.mp4" type="video/mp4">
+                                            <source src="videos/fallacy/boba_69_centers_iter_10000_fast_fs.mp4" type="video/mp4">
                                         </video>
                                     </div>
                                      <div class="video-item">
@@ -159,8 +159,8 @@
                             <p>This observed behavior, which we will call the 'wave effect,' describes how apparent object motion is often synthesized through the sequential activation of spatially localized or oscillating primitives, rather than the coherent, collective transport of a stable group of Gaussians. Such a mechanism presents a significant challenge for achieving robust object-level editing.</p>
 
                         <p>A primary challenge when training such models solely with a pixel-wise reconstruction loss (e.g., L1 + MS-SSIM) is that the learned Gaussians often lack object-centric coherence. The optimization prioritizes matching the target frame at each instant, which can be achieved even if individual Gaussians do not consistently track semantic objects. Instead, a "wave effect" can emerge: the appearance of a moving object is formed by different, spatially localized Gaussians activating, deactivating, or subtly shifting over time, much like a stadium wave or the propagation of sound. This creates a convincing illusion of motion at the macroscopic level, but the underlying primitives may not possess persistent object identity or long-range, coherent trajectories.</p>
-                        <figure>
-                            <img src="videos/fallacy/Lwave-Red-2.gif" alt="Wave effect metaphor" style="max-width: 50%; height: auto; border: 1px solid var(--border-color);">
+                        <figure class="figure-fig2">
+                            <img src="videos/fallacy/Lwave-Red-2.gif" alt="Wave effect metaphor">
                             <figcaption>Fig 2: The "wave effect" analogy. Local elements (representing Gaussians) create an illusion of a propagating wave (apparent object motion) through sequential local activities, without any single element traversing the entire path.</figcaption>
                         </figure>
                         <p>This lack of true object tracking is demonstrated in Figure 3 using our baseline model on the <code>boba_69</code> video.</p>
@@ -253,9 +253,9 @@
                     <section id="reconstruction-quality">
                         <h3>4.2 Reconstruction Quality</h3>
                         <p>Adding the optical flow loss acts as a regularizer and does not significantly degrade, and in some cases slightly improves, final reconstruction quality compared to the baseline. </p>
-                        <figure>
-                            <img src="videos/psnr.png" alt="PSNR Comparison Table" style="max-width: 60%; height: auto; border: 1px solid var(--border-color);">
-                            <figcaption>Table 1: Reconstruction quality (PSNR dB).</figcaption>
+                        <figure class="figure-graph1">
+                            <img src="videos/psnr.png" alt="PSNR Comparison Table">
+                            <figcaption>Graph 1: Reconstruction quality (PSNR dB).</figcaption>
                         </figure>
                     </section>
 
