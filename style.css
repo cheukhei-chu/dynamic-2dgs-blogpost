@@ -110,6 +110,14 @@ pre { padding: 0.8em 1em; overflow-x: auto; line-height: 1.45; }
     /* pointer-events: none; Optional: if it interferes with slider */
 }
 
+/* NEW: CSS for the overflow wrapper for mobile Safari clip-path fix */
+.video-over-wrapper {
+  position:absolute;
+  inset:0;
+  overflow:hidden;
+  pointer-events:none; /* so the slider is still draggable */
+}
+
 .comparison-slider {
     position: absolute;
     top: 0;
@@ -122,6 +130,7 @@ pre { padding: 0.8em 1em; overflow-x: auto; line-height: 1.45; }
     cursor: ew-resize; /* East-West resize cursor */
     transform: translateX(-50%); /* Center the handle */
     z-index: 10; /* Make sure it's on top */
+    touch-action: none; /* Prevent scroll interference on iOS */
     /* For touch devices, you might need to increase its effective touch area */
 }
 /* Optional: Add a more visible handle to the slider bar */

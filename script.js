@@ -32,16 +32,25 @@ document.addEventListener('DOMContentLoaded', () => {
     setTimeout(updateActiveTocLink, 100); // Initial check
 
     // --- Video Comparison Slider Logic ---
+    const clipPathSupported = CSS.supports('clip-path', 'inset(0 50% 0 0)') || CSS.supports('-webkit-clip-path', 'inset(0 50% 0 0)');
     const comparisonContainers = document.querySelectorAll('.comparison-container');
 
     comparisonContainers.forEach(container => {
         const videoOver = container.querySelector('.comparison-video-over');
+        const videoOverWrapper = container.querySelector('.video-over-wrapper'); // Get the wrapper
         const sliderElement = container.querySelector('.comparison-slider');
         const videoUnder = container.querySelector('.comparison-video-under'); // For syncing playback
 
-        if (!videoOver || !sliderElement || !videoUnder) {
-            console.warn("Comparison container missing required elements:", container);
+        if (!videoOver || !sliderElement || !videoUnder || !videoOverWrapper) { // Added videoOverWrapper check
+            console.warn("Comparison container missing required elements (videoOver, sliderElement, videoUnder, or videoOverWrapper):", container);
             return;
+        }
+
+        // Initial setup if clip-path is NOT supported, use wrapper width
+        if (!clipPathSupported) {
+            videoOverWrapper.style.width = '50%'; // Match initial clip-path implied state
+            videoOver.style.clipPath = 'none'; // Ensure video itself is not trying to clip
+            videoOver.style.webkitClipPath = 'none';
         }
         
         // Sync playback and volume
@@ -78,8 +87,12 @@ document.addEventListener('DOMContentLoaded', () => {
             let percentage = ((xPosition - containerRect.left) / containerRect.width) * 100;
             percentage = Math.max(0, Math.min(100, percentage)); // Clamp between 0 and 100
 
-            videoOver.style.clipPath = `inset(0 ${100 - percentage}% 0 0)`;
-            videoOver.style.webkitClipPath  = `inset(0 ${100 - percentage}% 0 0)`;  // Safari mobile
+            if (clipPathSupported) {
+                videoOver.style.clipPath = `inset(0 ${100 - percentage}% 0 0)`;
+                videoOver.style.webkitClipPath  = `inset(0 ${100 - percentage}% 0 0)`;
+            } else {
+                videoOverWrapper.style.width = `${percentage}%`;
+            }
             sliderElement.style.left = `${percentage}%`;
         }
 

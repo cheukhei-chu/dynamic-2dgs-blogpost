@@ -144,7 +144,7 @@
                                     <div class="video-item">
                                         <p class="video-label">Boba Cup Centers (Baseline)</p>
                                         <video autoplay loop muted playsinline class="vertical-video-constrained">
-                                            <source src="videos/fallacy/boba_69_centers_iter_10000_fast_fs.mp4" type="video/mp4">
+                                            <source src="videos/fallacy/boba_69_centers_iter_10000_fast_h264.mp4" type="video/mp4; codecs=avc1.64001F">
                                         </video>
                                     </div>
                                      <div class="video-item">
@@ -288,9 +288,11 @@
                                 <video autoplay loop muted playsinline width="100%" class="comparison-video-under" id="bearPurpleColor">
                                     <source src="videos/downstream/bear_39_bear_interior_recolored_to_0_0_0_0_1_0_w0_20_iter10000_optflow30000_pts249243b.mp4" type="video/mp4">
                                 </video>
-                                <video autoplay loop muted playsinline width="100%" class="comparison-video-over" id="bearOriginalColor">
-                                    <source src="videos/downstream/bear_39.mp4" type="video/mp4">
-                                </video>
+                                <div class="video-over-wrapper">
+                                    <video autoplay loop muted playsinline width="100%" class="comparison-video-over" id="bearOriginalColor">
+                                        <source src="videos/downstream/bear_39.mp4" type="video/mp4">
+                                    </video>
+                                </div>
                                 <div class="comparison-slider" data-for-container=".comparison-container:has(#bearOriginalColor)"></div>
                             </div>
                         </div>
