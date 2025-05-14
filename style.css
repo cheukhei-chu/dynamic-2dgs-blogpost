@@ -111,7 +111,9 @@ pre { padding: 0.8em 1em; overflow-x: auto; line-height: 1.45; }
 /* NEW: CSS for the overflow wrapper for mobile Safari clip-path fix */
 .video-over-wrapper {
   position:absolute;
-  inset:0;
+  top: 0;
+  left: 0;
+  bottom: 0;     /* no "right:0;" here */
   overflow:hidden;
   pointer-events:none; /* so the slider is still draggable */
 }
