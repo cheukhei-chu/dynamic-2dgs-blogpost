@@ -37,8 +37,9 @@
               <li><a href="#our-approach">3. Our Approach: Optical Flow Supervision</a>
                 <ul>
                   <li><a href="#baseline-model-details">3.1 Baseline Dynamic 2D Gaussian Model</a></li>
-                  <li><a href="#wave-effect-analysis-detailed">3.2 Deeper Dive: The "Wave Effect"</a></li>
-                  <li><a href="#optical-flow-integration">3.3 Integrating Optical Flow Loss</a></li>
+                  <li><a href="#trajectory-comparison">3.2 Trajectory Models: Polynomials vs. B-Splines</a></li>
+                  <li><a href="#wave-effect-analysis-detailed">3.3 Deeper Dive: The "Wave Effect"</a></li>
+                  <li><a href="#optical-flow-integration">3.4 Integrating Optical Flow Loss</a></li>
                 </ul>
               </li>
 
@@ -182,29 +183,56 @@
                         <p>The model is trained by minimizing an L2 reconstruction loss between the rendered frames \(\hat{I}(t)\) and ground truth frames \(I_{\text{gt}}(t)\):</p>
                         <p>\[ \mathcal{L}_{\text{recon}} = \sum_{t} \|\hat{I}(t) - I_{\text{gt}}(t)\|_2^2 \]</p>
                     </section>
+                    <section id="trajectory-comparison">
+                        <h3>3.2 Trajectory Models: Polynomials vs. B-Splines</h3>
+                        <p>The choice of how to model the temporal evolution of Gaussian parameters is crucial. While high-degree polynomials can represent complex paths, they can also be prone to instability or require many parameters to capture intricate motions faithfully. B-splines, with their local control property, offer a more flexible and often more robust alternative for modeling smooth trajectories. For a comparable number of learnable parameters (e.g., polynomial degree vs. number of B-spline control points), B-splines typically yield better reconstruction quality and more natural-looking motion, as demonstrated in the comparison below for the "boba_69" scene. The polynomial model (left) may exhibit more erratic or less smooth paths compared to the B-spline model (right).</p>
+                        <div style="max-width: 500px; margin: 2.5rem auto;">
+                            <figure class="side-by-side-video-pair">
+                                <div class="video-row video-row-layout-2">
+                                    <div class="video-item">
+                                        <p class="video-label">Polynomial (Degree 30)</p>
+                                        <video autoplay loop muted playsinline>
+                                            <source src="videos/bspline/boba_69_polydeg30b.mp4" type="video/mp4">
+                                            Your browser does not support the video tag.
+                                        </video>
+                                    </div>
+                                    <div class="video-item">
+                                        <p class="video-label">B-Spline (30 Control Points)</p>
+                                        <video autoplay loop muted playsinline>
+                                            <source src="videos/bspline/boba_69_bsplinectrl30b.mp4" type="video/mp4">
+                                            Your browser does not support the video tag.
+                                        </video>
+                                    </div>
+                                </div>
+                                <figcaption>Fig 4: Trajectory Model Comparison (Boba scene). Left: Polynomial (degree 30). Right: B-Spline (30 control points).</figcaption>
+                            </figure>
+                        </div>
+                    </section>
                     <section id="wave-effect-analysis-detailed">
-                        <h3>3.2 Deeper Dive: The "Wave Effect"</h3>
-                        <p>To understand the baseline's limitations in learning coherent object motion, we conducted diagnostic experiments. One such experiment involved rendering only those Gaussians whose initial positions (\(t=0\)) were on the right half of the screen for the <code>boba_69</code> video (where the boba cup moves from right to left). As seen in Figure 4, these Gaussians largely exhibit local, oscillatory motion and fail to translate coherently with the boba cup across the frame. This supports our "wave effect" hypothesis: apparent motion is achieved by local activations rather than consistent transport of object-specific primitives.</p>
-                        <figure>
-                            <div class="video-row video-row-layout-2">
-                                <div class="video-item">
-                                    <p class="video-label">Centers (Right Init, Baseline)</p>
-                                    <video autoplay loop muted playsinline class="vertical-video-constrained">
-                                        <source src="videos/fallacy/boba_69_diag_starts_right_centersb.mp4" type="video/mp4">
-                                    </video>
+                        <h3>3.3 Deeper Dive: The "Wave Effect"</h3>
+                        <p>To understand the baseline's limitations in learning coherent object motion, we conducted diagnostic experiments. One such experiment involved rendering only those Gaussians whose initial positions (\(t=0\)) were on the right half of the screen for the <code>boba_69</code> video (where the boba cup moves from right to left). As seen in Figure 5, these Gaussians largely exhibit local, oscillatory motion and fail to translate coherently with the boba cup across the frame. This supports our "wave effect" hypothesis: apparent motion is achieved by local activations rather than consistent transport of object-specific primitives.</p>
+                        <div style="max-width: 500px; margin: 2.5rem auto;">
+                            <figure class="side-by-side-video-pair">
+                                <div class="video-row video-row-layout-2">
+                                    <div class="video-item">
+                                        <p class="video-label">Centers (Right Init, Baseline)</p>
+                                        <video autoplay loop muted playsinline>
+                                            <source src="videos/fallacy/boba_69_diag_starts_right_centersb.mp4" type="video/mp4">
+                                        </video>
+                                    </div>
+                                     <div class="video-item">
+                                        <p class="video-label">Rendered (Right Init, Baseline)</p>
+                                        <video autoplay loop muted playsinline>
+                                            <source src="videos/fallacy/boba_69_diag_starts_right_renderedb.mp4" type="video/mp4">
+                                        </video>
+                                    </div>
                                 </div>
-                                 <div class="video-item">
-                                    <p class="video-label">Rendered (Right Init, Baseline)</p>
-                                    <video autoplay loop muted playsinline class="vertical-video-constrained">
-                                        <source src="videos/fallacy/boba_69_diag_starts_right_renderedb.mp4" type="video/mp4">
-                                    </video>
-                                </div>
-                            </div>
-                            <figcaption>Fig 4: Diagnostic for <code>boba_69</code> baseline (Gaussians initialized on right half)...</figcaption>
-                        </figure>
+                                <figcaption>Fig 5: Diagnostic for <code>boba_69</code> baseline (Gaussians initialized on right half)...</figcaption>
+                            </figure>
+                        </div>
                     </section>
                     <section id="optical-flow-integration">
-                        <h3>3.3 Integrating Optical Flow Loss</h3>
+                        <h3>3.4 Integrating Optical Flow Loss</h3>
                         <p>To encourage Gaussians to learn trajectories that better reflect true object motion, we introduce an optical flow consistency loss. First, we pre-compute dense optical flow \( \mathbf{f}_{\text{gt}}(u,v,t \to t+1) \) between all consecutive ground truth frames \(I_{\text{gt}}(t)\) and \(I_{\text{gt}}(t+1)\) using OpenCV's Farneback algorithm. </p>
                     <p>For each Gaussian \(i\) with opacity \(\alpha_i(t)\) above a threshold \(\tau_{\text{opac}}\) (e.g., 0.2) at time \(t\), its learned B-spline trajectory implies a 2D displacement from frame \(t\) to \(t+dt\). Its position at time \(t\) is \(xy_i(t)\), and its model-predicted position at the next frame time \(t'\) is \(xy_i(t')_{\text{model}}\). The model-implied displacement vector is:</p>
                     <p>\[ \Delta \mathbf{xy}_{\text{model},i}(t) = xy_i(t')_{\text{model}} - xy_i(t) \]</p>
@@ -241,13 +269,15 @@
                             </div>
                             <figcaption>Fig 6: Gaussian center tracks for "bear_39". Left: Baseline. Right: With Flow Loss.</figcaption>
                         </figure>
-                        <figure class="side-by-side-video-pair">
-                            <div class="video-row video-row-layout-2">
-                                 <div class="video-item"><p class="video-label">Baseline (No Flow)</p><video autoplay loop muted playsinline class="vertical-video-constrained"><source src="videos/optical_flow/boba_40_centers_iter_10000_optflow0.mp4" type="video/mp4"></video></div>
-                                <div class="video-item"><p class="video-label">With Optical Flow</p><video autoplay loop muted playsinline class="vertical-video-constrained"><source src="videos/optical_flow/boba_40_centers_iter_10000_optflow100000bruh.mp4" type="video/mp4"></video></div>
-                            </div>
-                            <figcaption>Fig 7: Gaussian center tracks for "boba". Left: Baseline. Right: With Flow Loss.</figcaption>
-                        </figure>
+                        <div style="max-width: 500px; margin: 2.5rem auto;">
+                            <figure class="side-by-side-video-pair">
+                                <div class="video-row video-row-layout-2">
+                                     <div class="video-item"><p class="video-label">Baseline (No Flow)</p><video autoplay loop muted playsinline><source src="videos/optical_flow/boba_40_centers_iter_10000_optflow0.mp4" type="video/mp4"></video></div>
+                                    <div class="video-item"><p class="video-label">With Optical Flow</p><video autoplay loop muted playsinline><source src="videos/optical_flow/boba_40_centers_iter_10000_optflow100000bruh.mp4" type="video/mp4"></video></div>
+                                </div>
+                                <figcaption>Fig 7: Gaussian center tracks for "boba". Left: Baseline. Right: With Flow Loss.</figcaption>
+                            </figure>
+                        </div>
                     </section>
 
                     <section id="editing-demos">
