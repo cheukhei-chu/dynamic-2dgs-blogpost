@@ -180,6 +180,27 @@ figure.side-by-side-video-pair {
 }
 /* End of NEW CSS */
 
+/* NEW: Style for vertically constrained videos, e.g., tall boba videos */
+.vertical-video-constrained {
+    max-height: 400px; /* Adjust as needed */
+    width: auto; /* Respect aspect ratio, overridden by HTML width if present or parent flex item width */
+    display: block; /* For standalone videos to allow margin auto */
+    margin-left: auto;
+    margin-right: auto;
+}
+/* End of NEW CSS */
+
+/* NEW: Style for standalone tall boba videos (Fig 3, Fig 10) */
+.standalone-boba-video {
+    height: 350px; /* Enforce a specific height */
+    width: 70%; /* This is already set in HTML, but reinforcing here for clarity */
+    object-fit: contain; /* Ensures video is scaled to fit within this height without cropping */
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+/* End of NEW CSS */
+
 /* Styling for tall boba videos in side-by-side comparison */
 .boba-video-pair .video-left {
     width: auto !important; /* Let intrinsic size dictate width */
@@ -227,15 +248,6 @@ figure.side-by-side-video-pair {
     article h2 { font-size: 1.5rem; }
     article h3 { font-size: 1.25rem; }
     .main-content-column { padding: 15px; }
-}
-
-/* NEW class for controlling height of tall/vertical videos */
-.vertical-video-constrained {
-    max-height: 450px; /* Adjust this value as needed */
-    width: auto; /* Allow width to adjust to maintain aspect ratio */
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
 }
 
 /* Ensure existing video styles don't conflict too much */
