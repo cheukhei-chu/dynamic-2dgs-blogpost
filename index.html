@@ -48,7 +48,8 @@
                   <li><a href="#reconstruction-quality">4.2 Reconstruction Quality</a></li>
                   <li><a href="#gaussian-motion-analysis">4.3 Gaussian Motion Analysis</a></li>
                   <li><a href="#editing-demos">4.4 Editing Demonstrations</a></li>
-                  <li><a href="#limitations-failures">4.5 Limitations & Failure Cases</a></li>
+                  <li><a href="#temporal-interpolation">4.5 Temporal Interpolation with Optical Flow</a></li>
+                  <li><a href="#limitations-failures">4.6 Limitations & Failure Cases</a></li>
                 </ul>
               </li>
 
@@ -141,14 +142,14 @@
                                 <div class="video-row video-row-layout-2">
                                     <div class="video-item">
                                         <p class="video-label">Boba Cup Centers (Baseline)</p>
-                                        <video autoplay loop muted playsinline controls class="vertical-video-constrained">
+                                        <video autoplay loop muted playsinline class="vertical-video-constrained">
                                             <source src="videos/fallacy/boba_69_centers_iter_10000_fast.mp4" type="video/mp4">
                                         </video>
                                     </div>
                                      <div class="video-item">
                                         <p class="video-label">"Walking Up Stairs" Centers (Baseline)</p>
                                         <video autoplay loop muted playsinline class="vertical-video-constrained">
-                                            <source src="videos/fun results/margulan_63_centers_iter_10000.MP4" type="video/mp4">
+                                            <source src="videos/fun_results/margulan_63_centers_iter_10000.MP4" type="video/mp4">
                                         </video>
                                     </div>
                                 </div>
@@ -255,7 +256,7 @@
                         <div class="comparison-container">
                             <div class="video-wrapper">
                                 <video autoplay loop muted playsinline width="100%" class="comparison-video-under" id="bearPurpleColor">
-                                    <source src="videos/downstream/bear_39_bear interior_recolored_to_0_0_0_0_1_0_w0_20_iter10000_optflow30000_pts249243b.mp4" type="video/mp4">
+                                    <source src="videos/downstream/bear_39_bear_interior_recolored_to_0_0_0_0_1_0_w0_20_iter10000_optflow30000_pts249243b.mp4" type="video/mp4">
                                 </video>
                                 <video autoplay loop muted playsinline width="100%" class="comparison-video-over" id="bearOriginalColor">
                                     <source src="videos/downstream/bear_39.mp4" type="video/mp4">
@@ -278,14 +279,38 @@
                         </figure>
                     </section>
 
+                    <section id="temporal-interpolation">
+                        <h3>4.5 Temporal Interpolation with Optical Flow</h3>
+                        <p>A key advantage of our optical flow-guided model, where Gaussian parameters are continuous functions of time \(t\), is the ability to perform smooth temporal interpolation. This allows rendering the scene at arbitrary frame rates higher than the original video, effectively creating slow-motion effects or denser temporal sampling at no additional training cost. The coherent trajectories enforced by optical flow ensure that these interpolated frames remain plausible.</p>
+                        <figure class="side-by-side-video-pair">
+                            <div class="video-row video-row-layout-2">
+                                <div class="video-item">
+                                    <p class="video-label">Original (1.5fps)</p>
+                                    <video autoplay loop muted playsinline>
+                                        <source src="videos/optflow_interp/bear_39_1p5fps.mp4" type="video/mp4">
+                                        Your browser does not support the video tag.
+                                    </video>
+                                </div>
+                                <div class="video-item">
+                                    <p class="video-label">Interpolated (3fps)</p>
+                                    <video autoplay loop muted playsinline>
+                                        <source src="videos/optflow_interp/bear_39_rendered_interpolated_iter_10000_3fps.mp4" type="video/mp4">
+                                        Your browser does not support the video tag.
+                                    </video>
+                                </div>
+                            </div>
+                            <figcaption>Fig 10: Temporal interpolation. Left: Original video at 1.5fps. Right: Same scene rendered at 3fps using the learned continuous Gaussian trajectories, demonstrating smooth interpolation.</figcaption>
+                        </figure>
+                    </section>
+
                     <section id="limitations-failures">
-                        <h3>4.5 Limitations & Failure Cases</h3>
-                        <p>While optical flow supervision improves consistency, challenges remain, particularly for very long sequences or extremely complex motions where tracking can degrade. For instance, in a 20-frame "boba" clip where the cup is recolored purple, we observe that towards the end of its trajectory, some edges of the boba cup may lose their purple coloring as the initially labeled Gaussians struggle to perfectly maintain coverage and coherence over the extended motion (Fig. 10).</p>
+                        <h3>4.6 Limitations & Failure Cases</h3>
+                        <p>While optical flow supervision improves consistency, challenges remain, particularly for very long sequences or extremely complex motions where tracking can degrade. For instance, in a 20-frame "boba" clip where the cup is recolored purple, we observe that towards the end of its trajectory, some edges of the boba cup may lose their purple coloring as the initially labeled Gaussians struggle to perfectly maintain coverage and coherence over the extended motion (Fig. 11).</p>
                         <figure>
                              <video autoplay loop muted playsinline width="70%" class="vertical-video-constrained standalone-boba-video">
                                 <source src="videos/limitations/boba_20_boba_recolored_to_0_0_0_0_1_0_w0_30_iter10000_optflow100000.MP4" type="video/mp4">
                             </video>
-                            <figcaption>Fig 10: Example of tracking/editing degradation: recolored boba cup (purple) showing some color bleed or loss of coverage at edges after extended motion in a 20-frame clip.</figcaption>
+                            <figcaption>Fig 11: Example of tracking/editing degradation: recolored boba cup (purple) showing some color bleed or loss of coverage at edges after extended motion in a 20-frame clip.</figcaption>
                         </figure>
                     </section>
                 </section>
