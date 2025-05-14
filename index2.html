@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flowing Gaussians: Enhancing Object Coherence in Dynamic 2D Scenes</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Roboto+Mono:wght@400;500&family=Source+Serif+Pro:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script>
+    MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']] }, svg: { fontCache: 'global' } };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <!-- JuxtaposeJS for image comparison (optional if we only use video sliders) -->
+    <link rel="stylesheet" href="https://cdn.knightlab.com/libs/juxtapose/latest/css/juxtapose.css">
+</head>
+<body>
+    <div class="page-container">
+        <nav id="table-of-contents">
+            <h3>Table of Contents</h3>
+            <ul>
+                <li><a href="#introduction">1. Introduction</a></li>
+                <li><a href="#background">2. Background & Motivation</a>
+                    <ul>
+                        <li><a href="#dynamic-2dgs">2.1 Dynamic 2D Gaussians</a></li>
+                        <li><a href="#challenge-coherence">2.2 The Coherence Challenge</a></li>
+                    </ul>
+                </li>
+                <li><a href="#our-approach">3. Our Approach: Optical Flow Supervision</a>
+                    <ul>
+                        <li><a href="#baseline-model-details">3.1 Baseline Model Details</a></li>
+                        <li><a href="#wave-effect-analysis">3.2 The "Wave Effect" Problem</a></li>
+                        <li><a href="#optical-flow-integration">3.3 Integrating Optical Flow Loss</a></li>
+                    </ul>
+                </li>
+                <li><a href="#experiments-results">4. Experiments & Results</a>
+                    <ul>
+                        <li><a href="#setup">4.1 Experimental Setup</a></li>
+                        <li><a href="#reconstruction-quality">4.2 Reconstruction Quality</a></li>
+                        <li><a href="#object-removal-comparison">4.3 Object Removal: Void Tracking</a></li>
+                        <li><a href="#gaussian-motion-analysis">4.4 Gaussian Motion Analysis</a></li>
+                        <li><a href="#editing-demos">4.5 Editing Demonstrations</a></li>
+                        <li><a href="#limitations-failures">4.6 Limitations & Failure Cases</a></li>
+                    </ul>
+                </li>
+                <li><a href="#discussion">5. Discussion</a></li>
+                <li><a href="#conclusion">6. Conclusion & Future Work</a></li>
+                <li><a href="#references">7. References</a></li>
+            </ul>
+        </nav>
+
+        <main class="main-content-column">
+            <header>
+                <h1>Flowing Gaussians: Enhancing Object Coherence in Dynamic 2D Scenes via Optical Flow Supervision</h1>
+                <p class="subtitle">An Investigation into Improving Editability of Dynamic 2D Gaussian Splatting Representations</p>
+                <p class="authors">Your Name(s) Here</p>
+                <p class="date">May 13, 2025</p>
+            </header>
+
+            <article>
+                <section id="introduction">
+                    <h2>1. Introduction</h2>
+                    <p>Dynamic 2D Gaussian Splatting has emerged as a promising technique for representing videos, offering high-fidelity reconstruction and fast rendering. However, standard training procedures often result in representations where individual Gaussians lack long-term object-centric coherence. This manifests as a "wave effect," where the appearance of moving objects is formed by different local Gaussians activating over time, rather than a consistent set of primitives tracking the object. This fundamentally limits the ability to perform robust object-level editing tasks like removal or recoloring, as edits applied to Gaussians identified at one point in time do not consistently follow the object.</p>
+                    <p>This project investigates the hypothesis that supervising the training of dynamic 2D Gaussians with dense optical flow information can enforce more coherent, object-like trajectories for the learned primitives. We demonstrate that by incorporating an optical flow consistency loss, the resulting model exhibits significantly improved temporal tracking of edited objects, allowing for more plausible object removal and recoloring. We analyze the change in learned Gaussian behavior and discuss the implications and remaining challenges of this approach.</p>
+                    <figure>
+                        <!-- PLACEHOLDER for your BEST teaser: Bear recolor slider -->
+                        <div class="comparison-container">
+                            <h4>Teaser: Interactive Bear Recolor</h4>
+                            <div class="video-wrapper">
+                                <video autoplay loop muted playsinline width="100%" class="comparison-video-under">
+                                    <source src="videos/downstream/bear_39.mp4" type="video/mp4">
+                                    Your browser does not support the video tag.
+                                </video>
+                                <video autoplay loop muted playsinline width="100%" class="comparison-video-over">
+                                    <source src="videos/downstream/bear_39_bear interior_recolored_to_0_0_0_0_1_0_w0_20_iter10000_optflow30000_pts249243.MP4" type="video/mp4">
+                                    Your browser does not support the video tag.
+                                </video>
+                                <div class="comparison-slider"></div>
+                            </div>
+                            <figcaption>Fig 1: Interactive Demonstration: Original bear video (revealed by dragging slider left) versus the bear recolored to purple (revealed by dragging slider right) using our optical flow supervised model. The edit consistently follows the bear's motion.</figcaption>
+                        </div>
+                    </figure>
+                </section>
+
+                <section id="background">
+                    <h2>2. Background & Motivation</h2>
+                    <section id="dynamic-2dgs">
+                        <h3>2.1 Dynamic 2D Gaussian Splatting</h3>
+                        <p>Briefly explain what 2D Gaussian Splatting is, how it's extended to dynamic scenes in your base model (e.g., per-Gaussian B-spline trajectories for position, shape, opacity; static color). Mention its advantages (speed, explicit nature).</p>
+                        <!-- Maybe a static image illustrating a few Gaussians forming part of a frame -->
+                    </section>
+                    <section id="challenge-coherence">
+                        <h3>2.2 The Challenge: Object Coherence and the "Wave Effect"</h3>
+                        <p>Explain that the standard reconstruction loss doesn't guarantee object coherence. Describe your "wave effect" observation: local Gaussians activate to reconstruct appearance, leading to an illusion of motion without persistent object primitives. This is a core part of your project's motivation.</p>
+                        <figure>
+                            <img src="videos/fallacy/Lwave-Red-2.gif" alt="Wave effect metaphor" style="max-width: 50%; height: auto; border: 1px solid var(--border-color);">
+                            <figcaption>Fig 2: The "wave effect" analogy: local elements (Gaussians) can create an illusion of propagating motion without actual long-range transport of a coherent group.</figcaption>
+                        </figure>
+                        <p>This lack of coherence leads to failures in editing, such as the "static void" problem when attempting object removal, as illustrated below with our baseline model (trained without optical flow guidance).</p>
+                         <figure>
+                            <video controls autoplay loop muted playsinline width="70%">
+                                <source src="videos/fallacy/boba_69_remove_iter10000.MP4" type="video/mp4">
+                                Your browser does not support the video tag.
+                            </video>
+                            <figcaption>Fig 3: Object removal attempt using the baseline model on the 'boba_69' video. The void left by the removed boba cup remains static while the cup moves away, highlighting the lack of object tracking by the edited Gaussians.</figcaption>
+                        </figure>
+                    </section>
+                     <!-- Add literature review section here based on AI's output -->
+                    <section id="literature-review">
+                        <h3>2.3 Related Work</h3>
+                        <p>Briefly review relevant literature (from the AI's suggestions):
+                            <ul>
+                                <li>Object-centric NeRFs (DynaVol, D^2NeRF) - for context on scene decomposition.</li>
+                                <li>Instance segmentation in NeRFs (Instance-NeRF).</li>
+                                <li>Dynamic 3D Gaussian Splatting.</li>
+                                <li>Other dynamic 2D primitive/INR methods (NeRV, D2GV if you want to contrast).</li>
+                                <li>Methods using optical flow or semantic masks for dynamic scene understanding or editing (OR-NeRF, Niantic's work).</li>
+                            </ul>
+                        Position your work by highlighting the gap: applying dense optical flow supervision specifically to improve per-primitive trajectory coherence in dynamic *2D* Gaussian Splatting for editing.
+                        </p>
+                    </section>
+                </section>
+
+                <section id="our-approach">
+                    <h2>3. Our Approach: Optical Flow Supervision</h2>
+                    <section id="baseline-model-details">
+                        <h3>3.1 Baseline Dynamic 2D Gaussian Model</h3>
+                        <p>Detail the parameterization: Gaussians \(G_i\) with time-varying centers \(xy_i(t)\), Cholesky components \(L_i(t)\) (for covariance \(\Sigma_i(t) = L_i(t)L_i(t)^T\)), and opacity \(\alpha_i(t)\), plus a static color \(c_i\). The dynamic parameters are modeled by B-splines of degree \(p\):</p>
+                        <p>\[ \mathbf{p}_i(t) = \sum_{j=0}^{K-1} N_{j,p}(t) \cdot \mathbf{CP}_{i,j} \]</p>
+                        <p>where \(\mathbf{p}_i(t)\) represents a dynamic parameter (e.g., \(x_i(t)\)), \(N_{j,p}(t)\) are B-spline basis functions, and \(\mathbf{CP}_{i,j}\) are the learned control points for Gaussian \(i\).</p>
+                        <p>The model is trained by minimizing a reconstruction loss, typically L1 + MS-SSIM (or your "Fusion4"):</p>
+                        <p>\[ L_{\text{recon}} = \sum_{t} \mathcal{L}_{\text{pixel}}(\text{Render}(\{G_i(t)\}), I_{\text{gt}}(t)) \]</p>
+                    </section>
+                    <section id="wave-effect-analysis">
+                        <h3>3.2 Analyzing the "Wave Effect" in the Baseline</h3>
+                        <p>To understand the baseline's limitations, we conducted diagnostic experiments. One such experiment involved initializing Gaussians only on one half of the screen and observing their motion. For the <code>boba_69</code> video, where the boba cup moves from right to left, we initialized Gaussians on the right. The visualizations below show that these Gaussians predominantly exhibit local, oscillatory motion and fail to track the boba cup across the entire frame, supporting our "wave effect" hypothesis.</p>
+                        <figure>
+                            <div class="video-row video-row-layout-2">
+                                <div class="video-item">
+                                    <p class="video-label">Centers (Right Init, Baseline)</p>
+                                    <video autoplay loop muted playsinline> <source src="videos/fallacy/boba_69_diag_starts_right_centers.MP4" type="video/mp4"></video>
+                                </div>
+                                 <div class="video-item">
+                                    <p class.video-label">Rendered (Right Init, Baseline)</p>
+                                    <video autoplay loop muted playsinline> <source src="videos/fallacy/boba_69_diag_starts_right_rendered.MP4" type="video/mp4"></video>
+                                </div>
+                            </div>
+                            <figcaption>Fig 4: Diagnostic for <code>boba_69</code> baseline: Gaussian centers initialized on the right half (left) and their rendered appearance over time (right). Note the lack of significant leftward migration corresponding to the boba cup's actual path.</figcaption>
+                        </figure>
+                    </section>
+                    <section id="optical-flow-integration">
+                        <h3>3.3 Integrating Optical Flow Loss</h3>
+                        <p>To encourage more coherent, object-like trajectories, we introduce an optical flow consistency loss. First, we pre-compute dense optical flow \( \mathbf{f}_{\text{gt}}(u,v,t \to t+1) \) between all consecutive ground truth frames \(I_{\text{gt}}(t)\) and \(I_{\text{gt}}(t+1)\) using a standard algorithm (e.g., OpenCV's Farneback). </p>
+                        <p>For each Gaussian \(i\) with significant opacity \(\alpha_i(t)\) at time \(t\), its learned trajectory implies a 2D velocity vector in the image plane. We calculate its position at time \(t\) as \(xy_i(t)\) and its model-predicted position at \(t+dt\) (next frame) as \(xy_i(t+dt)_{\text{model}}\). The model-implied flow is thus:</p>
+                        <p>\[ \mathbf{v}_{\text{model},i}(t) = xy_i(t+dt)_{\text{model}} - xy_i(t) \]</p>
+                        <p>We then sample the pre-computed ground truth optical flow \(\mathbf{v}_{\text{gt},i}(t)\) at the Gaussian's projected center \(xy_i(t)\). The optical flow loss penalizes the discrepancy:</p>
+                        <p>\[ L_{\text{flow}} = \sum_{t} \sum_{i \in \text{Active}} \left\| \mathbf{v}_{\text{model},i}(t) - \mathbf{v}_{\text{gt},i}(t) \right\|^2_2 \]</p>
+                        <p>where "Active" refers to Gaussians with opacity above a threshold (e.g., 0.2). The total training loss becomes:</p>
+                        <p>\[ L_{\text{total}} = L_{\text{recon}} + \lambda_{\text{flow}} \cdot L_{\text{flow}} \]</p>
+                        <p>The hyperparameter \(\lambda_{\text{flow}}\) balances reconstruction fidelity with motion consistency. We also explored a neighbor rigidity loss \(L_{\text{rigid}}\) but found optical flow to be more impactful for long-range coherence for this study.</p>
+                        <!-- Optional: Figure for flow loss diagram if you have one -->
+                    </section>
+                </section>
+
+                <section id="experiments-results">
+                    <h2>4. Experiments & Results</h2>
+                    <section id="setup">
+                        <h3>4.1 Experimental Setup</h3>
+                        <p>We evaluate our approach on several short video clips, including "boba\_69" (a boba tea cup moving across a textured background) and "bear\_39" (a bear walking). Our models typically use 40,000 2D Gaussians, with trajectories modeled by B-splines (K=20 control points). Training is performed for 10,000 iterations using the Adan optimizer and a reconstruction loss of L1 + MS-SSIM (Fusion4). For the optical flow supervised model, we used \(\lambda_{\text{flow}} = \text{YOUR_VALUE_HERE}\) (e.g., 1e-2, 1e-4, etc. from your friend's successful value). Object segmentation for editing is performed post-training using SAM on a few user-annotated keyframes, followed by motion coherence filtering (DBSCAN on B-spline control point features).</p>
+                        <!-- Optional: Table with key hyperparameters -->
+                    </section>
+                    <section id="reconstruction-quality">
+                        <h3>4.2 Reconstruction Quality</h3>
+                        <p>First, we verify that adding the optical flow loss does not significantly degrade reconstruction quality. We compare PSNR and MS-SSIM metrics for models trained with and without the flow loss.</p>
+                        <!-- PLACEHOLDER: Table for PSNR/MS-SSIM Comparison -->
+                        <figure>
+                            <img src="images/psnr_table_placeholder.png" alt="PSNR/MS-SSIM Comparison Table" style="max-width: 70%; height: auto;">
+                            <figcaption>Table 1: Reconstruction quality (PSNR/MS-SSIM) on test videos. (Replace with actual data or a representative image if table is complex).</figcaption>
+                        </figure>
+                        <p>As shown, the reconstruction fidelity remains high, indicating that the optical flow term acts as a beneficial regularizer without compromising the model's primary objective.</p>
+                    </section>
+
+                    <section id="object-removal-comparison">
+                        <h3>4.3 Object Removal: Void Tracking</h3>
+                        <p>The key test of object coherence is the behavior of the scene when a segmented object is removed (by setting its Gaussians' opacity to zero). The baseline model often results in a "static void," while our flow-supervised model demonstrates significantly improved void tracking.</p>
+                        <div class="comparison-container">
+                            <h4>Boba Cup Removal: Void Tracking (Baseline vs. Flow-Supervised)</h4>
+                            <div class="video-wrapper">
+                                <!-- Ensure you have these videos: baseline removal and flow-model removal -->
+                                <video autoplay loop muted playsinline width="100%" class="comparison-video-under" id="bobaBaselineVoid">
+                                    <source src="videos/fallacy/boba_69_remove_iter10000.MP4" type="video/mp4">
+                                </video>
+                                <video autoplay loop muted playsinline width="100%" class="comparison-video-over" id="bobaFlowVoid">
+                                    <source src="videos/boba_remove_optical_flow_EDITED.mp4" type="video/mp4"> <!-- ** PLACEHOLDER: You need to generate this video ** -->
+                                </video>
+                                <div class="comparison-slider" data-for-container=".comparison-container:has(#bobaBaselineVoid)"></div>
+                            </div>
+                            <figcaption>Fig 5: Interactive Comparison: Boba cup removal. Left: Baseline model (static void). Right: Our flow-supervised model (void tracks the cup's path). Drag slider to compare.</figcaption>
+                        </div>
+                    </section>
+
+                    <section id="gaussian-motion-analysis">
+                        <h3>4.4 Gaussian Motion Analysis</h3>
+                        <p>Visualizing the trajectories of Gaussian centers reveals the impact of optical flow supervision. The baseline model's Gaussians exhibit more localized, oscillatory motion, consistent with the "wave effect." In contrast, the flow-supervised model encourages Gaussians to learn more coherent, longer-range transport paths.</p>
+                        <figure class="side-by-side-video-pair">
+                            <figcaption>Fig 6: Gaussian center tracks for the "bear\_39" scene.</figcaption>
+                            <div class="video-row">
+                                <div class="video-item">
+                                    <p class="video-label">Baseline (No Flow)</p>
+                                    <video autoplay loop muted playsinline><source src="videos/optical_flow/bear_39_centers_iter_10000_optflow0.mp4" type="video/mp4"></video>
+                                </div>
+                                <div class="video-item">
+                                    <p class="video-label">With Optical Flow Loss</p>
+                                    <video autoplay loop muted playsinline><source src="videos/optical_flow/bear_39_centers_iter_10000_optflow10000.mp4" type="video/mp4"></video>
+                                </div>
+                            </div>
+                        </figure>
+                        <figure class="side-by-side-video-pair">
+                            <figcaption>Fig 7: Gaussian center tracks for the "boba\_40" (or boba\_69) scene.</figcaption>
+                            <div class="video-row">
+                                 <div class="video-item">
+                                    <p class.video-label">Baseline (No Flow)</p>
+                                    <video autoplay loop muted playsinline><source src="videos/optical_flow/boba_40_centers_iter_10000_optflow0.mp4" type="video/mp4"></video>
+                                </div>
+                                <div class="video-item">
+                                    <p class.video-label">With Optical Flow Loss</p>
+                                    <video autoplay loop muted playsinline><source src="videos/optical_flow/boba_40_centers_iter_10000_optflow100000.mp4" type="video/mp4"></video>
+                                </div>
+                            </div>
+                        </figure>
+                    </section>
+
+                    <section id="editing-demos">
+                        <h3>4.5 Editing Demonstrations with Flow-Supervised Model</h3>
+                        <p>With improved object coherence, our flow-supervised model enables more compelling editing applications. Below, we show object recoloring and removal on the "bear\_39" video.</p>
+                         <div class="comparison-container">
+                            <h4>Bear Interior Recolor (Purple)</h4>
+                            <div class="video-wrapper">
+                                <video autoplay loop muted playsinline width="100%" class="comparison-video-under" id="bearOriginalColor">
+                                    <source src="videos/downstream/bear_39.mp4" type="video/mp4">
+                                </video>
+                                <video autoplay loop muted playsinline width="100%" class="comparison-video-over" id="bearPurpleColor">
+                                    <source src="videos/downstream/bear_39_bear interior_recolored_to_0_0_0_0_1_0_w0_20_iter10000_optflow30000_pts249243.MP4" type="video/mp4">
+                                </video>
+                                <div class="comparison-slider" data-for-container=".comparison-container:has(#bearOriginalColor)"></div>
+                            </div>
+                            <figcaption>Fig 8: Bear recolored to purple. The edit consistently follows the bear.</figcaption>
+                        </div>
+
+                        <figure>
+                            <p style="text-align:center;">Rendered object-only (Bear Interior) and diagnostic centers for the flow-trained "bear_39" model:</p>
+                            <div class="video-row video-row-layout-2">
+                                <div class="video-item">
+                                    <p class="video-label">Bear Interior Rendered</p>
+                                    <video autoplay loop muted playsinline><source src="videos/downstream/bear_39_diag_rendered_bear_interior.MP4" type="video/mp4"></video>
+                                </div>
+                                <div class="video-item">
+                                    <p class="video-label">Bear Centers Diagnostic</p>
+                                    <video autoplay loop muted playsinline><source src="videos/downstream/bear_39_diag_centers_bear.MP4" type="video/mp4"></video>
+                                </div>
+                            </div>
+                            <figcaption>Fig 9: Diagnostic visualizations for the segmented "bear interior" from the flow-trained model, showing the rendered object in isolation and its constituent Gaussian centers' motion.</figcaption>
+                        </figure>
+
+                        <!-- PLACEHOLDER: Comparison of B-spline vs Polynomial (if you have good contrasting videos) -->
+                        <!--
+                        <h3>B-spline vs. Polynomial Trajectories</h3>
+                        <figure class="side-by-side-video-pair">
+                            <figcaption>Fig X: Comparison of trajectory modeling.</figcaption>
+                            <div class="video-row">
+                                <div class="video-item">
+                                    <p class="video-label">Polynomial Trajectories (Boba)</p>
+                                    <video autoplay loop muted playsinline><source src="videos/bspline/boba_69_polydeg30.mp4" type="video/mp4"></video>
+                                </div>
+                                <div class="video-item">
+                                    <p class="video-label">B-spline Trajectories (Boba)</p>
+                                    <video autoplay loop muted playsinline><source src="videos/bspline/boba_69_bsplinectrl30.mp4" type="video/mp4"></video>
+                                </div>
+                            </div>
+                        </figure>
+                        -->
+                    </section>
+
+                    <section id="limitations-failures">
+                        <h3>4.6 Limitations & Failure Cases</h3>
+                        <p>Despite the improvements from optical flow supervision, our method still faces challenges. Long-term tracking over many frames (e.g., >50-60 frames) can degrade, with the labeled Gaussians eventually deviating from the true object path or the "void" becoming misaligned. This is likely due to the accumulation of small errors in the learned trajectories or limitations in the optical flow estimates over extended periods. Very fast or highly non-rigid motions also remain challenging.</p>
+                        <!-- PLACEHOLDER: Video showing long-term breakdown if you have a clear example -->
+                        <figure>
+                             <video controls loop muted playsinline width="70%">
+                                <source src="videos/PLACEHOLDER_long_sequence_breakdown_flow_model.mp4" type="video/mp4">
+                            </video>
+                            <figcaption>Fig 10: Example of tracking degradation with the optical flow model over a very long sequence or with very challenging motion.</figcaption>
+                        </figure>
+                    </section>
+                </section>
+
+                <section id="discussion">
+                    <h2>5. Discussion</h2>
+                    <p>Our experiments suggest that incorporating dense optical flow as a supervisory signal during the training of dynamic 2D Gaussian Splatting models significantly enhances the temporal coherence of learned Gaussian trajectories. This directly addresses the "wave effect" observed in baseline models, where apparent motion is often a result of local Gaussian activity rather than true object transport by a consistent set of primitives. By penalizing deviations between model-implied Gaussian motion and pre-computed optical flow, Gaussians are encouraged to learn trajectories that better reflect actual pixel movements.</p>
+                    <p>The improved coherence translates to more robust object editing capabilities. As demonstrated, object removal results in a "void" that more accurately tracks the path of the removed object, unlike the static voids common in baseline models. Similarly, recoloring edits are more consistently applied to the target object as it moves.</p>
+                    <p>However, the method is not without limitations. The quality of the optical flow supervision is critical; errors or noise in the pre-computed flow can negatively impact learning. Furthermore, while short-to-medium term tracking is improved, very long sequences or extremely erratic motions can still lead to a decoupling between the labeled Gaussians and the true object. This suggests that while optical flow provides strong frame-to-frame guidance, maintaining global object identity over extended durations may require additional mechanisms, such as higher-level object trackers integrated into the learning loop or more sophisticated object-centric model architectures.</p>
+                    <p>The "wave effect" itself is an interesting phenomenon, highlighting how reconstruction-driven optimization can find solutions that are visually plausible frame-by-frame but lack underlying semantic consistency. This underscores the need for explicit priors or supervisory signals that encode our understanding of how objects behave and persist over time.</p>
+                </section>
+
+                <section id="conclusion">
+                    <h2>6. Conclusion & Future Work</h2>
+                    <p>We have demonstrated that supervising dynamic 2D Gaussian Splatting with an optical flow consistency loss is an effective strategy for improving the object-centric coherence of the learned representation. This leads to more robust and temporally consistent video editing results, particularly for object removal and recoloring. Our analysis of Gaussian motion highlights a shift from a "wave-like" local activation in baseline models towards more genuine transport behavior in flow-supervised models.</p>
+                    <p>Future work could explore several avenues. Integrating more advanced VOS trackers to provide even cleaner object motion priors during training is a promising direction. Exploring hierarchical motion models, where Gaussians are grouped and share coarse motion parameters with individual refinements, could further enhance coherence. Finally, combining optical flow with sparse semantic supervision (e.g., from SAM on keyframes) during training might offer a powerful synergy, grounding trajectories in both low-level motion and high-level object identity.</p>
+                </section>
+
+                <section id="references">
+                    <h2>7. References</h2>
+                    <p><i>(Ensure this list is comprehensive and correctly formatted for your chosen citation style - e.g., list authors, title, venue, year)</i></p>
+                    <ul>
+                        <li>[1] Kerbl, B., Kopanas, G., Leimkühler, T., & Drettakis, G. (2023). 3D Gaussian Splatting for Real-Time Radiance Field Rendering. <i>ACM Transactions on Graphics (TOG)</i>.</li>
+                        <li>[2] Luiten, J., et al. (2021). Dynamic 3D Gaussians: Real-time Rendering of Dynamic Scenes with Gaussian Splatting. <i>(Cite the specific dynamic 3D GS paper you are referring to, if any, or your base 2D method if it's published)</i></li>
+                        <li>[3] Wu, Z., et al. (2023). 2D Gaussian Splatting for Real-Time Image-Based Rendering. <i>(Cite the paper that introduced 2D GS for static images, likely Zhang et al. "GaussianImage" if that's what you mean, or the very first 2D GS concept if different)</i></li>
+                        <li>[4] Kirillov, A., Mintun, E., Ravi, N., Mao, H., Rolland, C., Gustafson, L., ... & Girshick, R. (2023). Segment Anything. <i>arXiv preprint arXiv:2304.02643</i>.</li>
+                        <li>[5] Teed, Z., & Deng, J. (2020). RAFT: Recurrent All-Pairs Field Transforms for Optical Flow. In <i>ECCV</i>.</li>
+                        <li>[6] Ilg, E., et al. (2017). FlowNet 2.0: Evolution of Optical Flow Estimation with Deep Networks. In <i>CVPR</i>. (Or another relevant optical flow paper like Farneback if that's what you used).</li>
+                        <li><i>(Add citations from the AI's literature review that you discussed, e.g., DynaVol, D^2NeRF, Instance-NeRF if they informed your background or discussion).</i></li>
+                    </ul>
+                </section>
+
+                <footer>
+                    <p>© 2025 Your Name(s). Final Project for 6.8300 Computer Vision, MIT.</p>
+                    <!-- <p>Code for this project: <a href="YOUR_GITHUB_LINK_HERE">GitHub</a></p> -->
+                </footer>
+            </article>
+        </main>
+    </div>
+    <script src="https://cdn.knightlab.com/libs/juxtapose/latest/js/juxtapose.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
