@@ -139,23 +139,25 @@
                     <section id="challenge-coherence">
                         <h3>2.2 The Coherence Challenge</h3>
                             <p>Initial analysis of Gaussian primitives trained solely with a reconstruction objective reveals characteristic motion patterns. The animations below (Figure 1) depict the trajectories of Gaussian centers for two distinct dynamic scenes: <code>boba_69</code> (a boba tea cup moving across a surface) and <code>margulan_63</code> (a person ascending stairs). While the rendered output of these baseline models achieves high fidelity in frame reconstruction (cf. Section 4.2), the underlying motion of individual Gaussian centers displays a notable phenomenon.</p>
-                            <figure class="side-by-side-video-pair">
-                                <div class="video-row video-row-layout-2">
-                                    <div class="video-item">
-                                        <p class="video-label">Boba Cup Centers (Baseline)</p>
-                                        <video autoplay loop muted playsinline class="vertical-video-constrained">
-                                            <source src="videos/fallacy/boba_69_centers_iter_10000_fast_h264.mp4" type="video/mp4; codecs=avc1.64001F">
-                                        </video>
+                            <div style="max-width: 500px; margin: 2.5rem auto;">
+                                <figure class="side-by-side-video-pair">
+                                    <div class="video-row video-row-layout-2">
+                                        <div class="video-item">
+                                            <p class="video-label">Boba Cup Centers (Baseline)</p>
+                                            <video autoplay loop muted playsinline>
+                                                <source src="videos/fallacy/boba_69_centers_iter_10000_fast_h264.mp4" type="video/mp4; codecs=avc1.64001F">
+                                            </video>
+                                        </div>
+                                         <div class="video-item">
+                                            <p class="video-label">"Walking Up Stairs" Centers (Baseline)</p>
+                                            <video autoplay loop muted playsinline>
+                                                <source src="videos/fun_results/margulan_63_centers_iter_10000_h264.MP4" type="video/mp4">
+                                            </video>
+                                        </div>
                                     </div>
-                                     <div class="video-item">
-                                        <p class="video-label">"Walking Up Stairs" Centers (Baseline)</p>
-                                        <video autoplay loop muted playsinline class="vertical-video-constrained">
-                                            <source src="videos/fun_results/margulan_63_centers_iter_10000_h264.MP4" type="video/mp4">
-                                        </video>
-                                    </div>
-                                </div>
-                                <figcaption>Fig 1: Animated Gaussian centers from baseline models (no optical flow loss). Left: <code>boba_69</code> scene. Right: <code>margulan_63</code> scene (person walking up stairs). Notice the localized, often oscillatory, motion of individual Gaussians creating a collective "wave" that forms the appearance of moving objects.</figcaption>
-                            </figure>
+                                    <figcaption>Fig 1: Animated Gaussian centers from baseline models (no optical flow loss). Left: <code>boba_69</code> scene. Right: <code>margulan_63</code> scene (person walking up stairs). Notice the localized, often oscillatory, motion of individual Gaussians creating a collective "wave" that forms the appearance of moving objects.</figcaption>
+                                </figure>
+                            </div>
                             <p>This observed behavior, which we will call the 'wave effect,' describes how apparent object motion is often synthesized through the sequential activation of spatially localized or oscillating primitives, rather than the coherent, collective transport of a stable group of Gaussians. Such a mechanism presents a significant challenge for achieving robust object-level editing.</p>
 
                         <p>A primary challenge when training such models solely with a pixel-wise reconstruction loss (e.g., L1 + MS-SSIM) is that the learned Gaussians often lack object-centric coherence. The optimization prioritizes matching the target frame at each instant, which can be achieved even if individual Gaussians do not consistently track semantic objects. Instead, a "wave effect" can emerge: the appearance of a moving object is formed by different, spatially localized Gaussians activating, deactivating, or subtly shifting over time, much like a stadium wave or the propagation of sound. This creates a convincing illusion of motion at the macroscopic level, but the underlying primitives may not possess persistent object identity or long-range, coherent trajectories.</p>
@@ -285,7 +287,7 @@
                         <p>The improved object coherence from optical flow supervision enables more compelling and efficient editing applications. To achieve edits like the object recoloring showcased below for the <code>bear_39</code> video, we first apply the Segment Anything Model (SAM) over a user-defined bounding box containing the bear in a reference frame. SAM segments the bear, and we then identify the set of 2D Gaussians whose centers fall within this segmentation mask at that frame. This effectively filters the Gaussians representing the bear. Once these object-specific Gaussians are identified, their parameters (e.g., color) can be modified. Subsequent rendering of the edited video, now with the modified Gaussians, is extremely fast, taking less than 1 second for the entire clip, as it leverages the pre-optimized dynamic representation. The edit consistently follows the bear's motion due to the enhanced trajectory learning from the optical flow supervision.</p>
                         <div class="comparison-container" id="bear-compare">
                           <!-- hidden sources -->
-                          <video id="bearUnder"  muted loop playsinline src="videos/downstream/bear_39.mp4"></video>
+                          <video id="bearUnder"  muted loop playsinline src="videos/downstream/bear_39_h264.MP4"></video>
                           <video id="bearOver"   muted loop playsinline src="videos/downstream/bear_39_bear_interior_recolored_to_0_0_0_0_1_0_w0_20_iter10000_optflow30000_pts249243b.mp4"></video>
                         
                           <!-- visible surface -->
