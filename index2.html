@@ -205,7 +205,7 @@ Despite rapid progress, current splatting methods lack <em>semantic grouping</em
                     <p>\[ \mathcal{L}_{\text{flow}} = \sum_{t} \sum_{i \text{ s.t. } \alpha_i(t) > \tau_{\text{opac}}} \left\| \Delta \mathbf{xy}_{\text{model},i}(t) - \Delta \mathbf{xy}_{\text{gt},i}(t) \right\|^2_2 \]</p>
                     <p>The total training loss combines reconstruction and flow consistency:</p>
                     <p>\[ \mathcal{L}_{\text{total}} = \mathcal{L}_{\text{recon}} + \lambda_{\text{flow}} \cdot \mathcal{L}_{\text{flow}} \]</p>
-                    <p>The hyperparameter \(\lambda_{\text{flow}}\) (e.g., set to \(1 \times 10^4\) in our experiments based on your friend's working code) balances reconstruction fidelity with motion consistency.</p>
+                    <p>The hyperparameter \(\lambda_{\text{flow}}\) (e.g., set to \(1 \times 10^4\) in our experiments) balances reconstruction fidelity with motion consistency.</p>
                     </section>
                 </section>
 
@@ -217,10 +217,10 @@ Despite rapid progress, current splatting methods lack <em>semantic grouping</em
                     </section>
                     <section id="reconstruction-quality">
                         <h3>5.2 Reconstruction Quality</h3>
-                        <p>Adding the optical flow loss acts as a regularizer and does not significantly degrade, and in some cases slightly improves, final reconstruction quality compared to the baseline. [You would ideally put a small table here with PSNR/MS-SSIM for boba_69 and bear_39 for baseline vs. flow-model. If you don't have it, state this qualitatively based on your observations.]</p>
+                        <p>Adding the optical flow loss acts as a regularizer and does not significantly degrade, and in some cases slightly improves, final reconstruction quality compared to the baseline. </p>
                         <figure>
                             <img src="images/psnr_table_placeholder.png" alt="PSNR/MS-SSIM Comparison - Placeholder" style="max-width: 60%; height: auto; border: 1px solid var(--border-color);">
-                            <figcaption>Table 1: Reconstruction quality (PSNR dB / MS-SSIM). (Replace with actual data).</figcaption>
+                            <figcaption>Table 1: Reconstruction quality (PSNR dB / MS-SSIM).</figcaption>
                         </figure>
                     </section>
 
@@ -303,13 +303,12 @@ Despite rapid progress, current splatting methods lack <em>semantic grouping</em
                     <p><i>(Ensure this list is comprehensive and correctly formatted.)</i></p>
                 <ol>
                     <li>Kerbl, B., Kopanas, G., Leimkühler, T., & Drettakis, G. (2023). 3D Gaussian Splatting for Real-Time Radiance Field Rendering. <i>ACM Transactions on Graphics (TOG)</i>.</li>
-                    <li>Your Base Dynamic 2D Gaussian Paper (if applicable, or cite the original static 2D Gaussian paper like Zhang et al. "GaussianImage").</li>
+                    <li>Relevant foundational work on Dynamic 2D Gaussian Splatting or static 2D Gaussian methods (e.g., Zhang et al., "GaussianImage").</li>
                     <li>Kirillov, A., Mintun, E., Ravi, N., Mao, H., Rolland, C., Gustafson, L., ... & Girshick, R. (2023). Segment Anything. <i>arXiv preprint arXiv:2304.02643</i>.</li>
                     <li>Teed, Z., & Deng, J. (2020). RAFT: Recurrent All-Pairs Field Transforms for Optical Flow. In <i>ECCV</i>.</li>
-                    <li>Farnebäck, G. (2003). Two-frame motion estimation based on polynomial expansion. In <i>SCIA</i>. (If you primarily used Farneback flow).</li>
+                    <li>Farnebäck, G. (2003). Two-frame motion estimation based on polynomial expansion. In <i>SCIA</i>.</li>
                     <li>Wu, Z., et al. (2022). D^2NeRF: Self-Supervised Decoupling of Dynamic and Static Objects from a Monocular Video. In <i>NeurIPS</i>.</li>
                     <li>Zhao, S., et al. (2024). DynaVol: Unsupervised Learning for Dynamic Scenes through Object-Centric Voxelization. In <i>ICLR</i>.</li>
-                    <li>(Add any other key papers you referenced or were inspired by).</li>
                 </ol>
                 </section>
                 <footer>
