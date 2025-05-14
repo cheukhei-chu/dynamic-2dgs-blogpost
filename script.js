@@ -32,27 +32,33 @@ document.addEventListener('DOMContentLoaded', () => {
     setTimeout(updateActiveTocLink, 100); // Initial check
 
     // --- Video Comparison Slider Logic ---
-    const clipPathSupported = CSS.supports('clip-path', 'inset(0 50% 0 0)') || CSS.supports('-webkit-clip-path', 'inset(0 50% 0 0)');
+    const isIOS = /iP(ad|hone|od)/.test(navigator.userAgent);
+    const actualClipPathSupport = CSS.supports('clip-path', 'inset(0 50% 0 0)') || CSS.supports('-webkit-clip-path', 'inset(0 50% 0 0)');
+    const useClipPathStrategy = !isIOS && actualClipPathSupport;
+
     const comparisonContainers = document.querySelectorAll('.comparison-container');
 
     comparisonContainers.forEach(container => {
         const videoOver = container.querySelector('.comparison-video-over');
-        const videoOverWrapper = container.querySelector('.video-over-wrapper'); // Get the wrapper
+        const videoOverWrapper = container.querySelector('.video-over-wrapper');
         const sliderElement = container.querySelector('.comparison-slider');
-        const videoUnder = container.querySelector('.comparison-video-under'); // For syncing playback
+        const videoUnder = container.querySelector('.comparison-video-under');
 
-        if (!videoOver || !sliderElement || !videoUnder || !videoOverWrapper) { // Added videoOverWrapper check
-            console.warn("Comparison container missing required elements (videoOver, sliderElement, videoUnder, or videoOverWrapper):", container);
+        if (!videoOver || !videoOverWrapper || !sliderElement || !videoUnder) {
+            console.warn("Comparison container missing required elements (videoOver, videoOverWrapper, sliderElement, or videoUnder):", container);
             return;
         }
 
-        // Initial setup if clip-path is NOT supported, use wrapper width
-        if (!clipPathSupported) {
-            videoOverWrapper.style.width = '50%'; // Restore: Set initial width for the wrapper
-            videoOver.style.clipPath = 'none'; // Ensure video itself is not trying to clip via clip-path
+        // Initial setup based on the determined strategy
+        if (useClipPathStrategy) {
+            videoOver.style.clipPath = 'inset(0 50% 0 0)';
+            videoOver.style.webkitClipPath = 'inset(0 50% 0 0)';
+            // Ensure wrapper doesn't interfere if clip-path is used on video
+            // videoOverWrapper.style.width = '100%'; // Not strictly needed due to inset:0 on wrapper
+        } else {
+            videoOverWrapper.style.width = '50%';
+            videoOver.style.clipPath = 'none';
             videoOver.style.webkitClipPath = 'none';
-            // videoOver.style.webkitMaskImage = 'linear-gradient(to right, black 50%, transparent 50%)'; // REMOVE
-            // videoOver.style.maskImage = 'linear-gradient(to right, black 50%, transparent 50%)'; // REMOVE
         }
         
         // Sync playback and volume
@@ -89,13 +95,11 @@ document.addEventListener('DOMContentLoaded', () => {
             let percentage = ((xPosition - containerRect.left) / containerRect.width) * 100;
             percentage = Math.max(0, Math.min(100, percentage)); // Clamp between 0 and 100
 
-            if (clipPathSupported) {
+            if (useClipPathStrategy) {
                 videoOver.style.clipPath = `inset(0 ${100 - percentage}% 0 0)`;
                 videoOver.style.webkitClipPath  = `inset(0 ${100 - percentage}% 0 0)`;
             } else {
-                videoOverWrapper.style.width = `${percentage}%`; // Restore: Set wrapper width
-                // videoOver.style.webkitMaskImage = `linear-gradient(to right, black ${percentage}% , transparent ${percentage}%)`; // REMOVE
-                // videoOver.style.maskImage = `linear-gradient(to right, black ${percentage}% , transparent ${percentage}%)`; // REMOVE
+                videoOverWrapper.style.width = `${percentage}%`;
             }
             sliderElement.style.left = `${percentage}%`;
         }
