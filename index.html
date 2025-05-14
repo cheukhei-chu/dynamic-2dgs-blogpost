@@ -96,7 +96,7 @@
                 <section id="results">
                     <h2>4. Experiments & Results</h2>
                     <p>Detail your experimental setup: datasets (boba, bear, etc.), model parameters, training details, and evaluation metrics (qualitative focus, PSNR/SSIM for reconstruction).</p>
-                    
+
                     <section id="void-tracking">
                         <h3>4.1 Void Tracking: Baseline vs. Optical Flow</h3>
                         <p>A critical test for object removal is how well the "void" (the transparent region) tracks the removed object. The baseline model often exhibits a static void, while our optical flow supervised model shows improved tracking.</p>
@@ -113,7 +113,7 @@
                                 <video autoplay loop muted playsinline width="100%" class="comparison-video-over">
                                     <source src="videos/downstream/boba_remove_optical_flow.mp4" type="video/mp4">
                                 </video>
-                                <div class="comparison-slider"></div> 
+                                <div class="comparison-slider"></div>
                             </div>
                             <figcaption>Fig. X: Void Tracking Comparison: Baseline (left) vs. Optical Flow Model (right).</figcaption>
                         </div>
@@ -154,21 +154,21 @@
                                 <div class="video-item">
                                     <p class="video-label">Diag: Centers (Right Init)</p>
                                     <video autoplay loop muted playsinline>
-                                        <source src="videos/fallacy/boba_69_diag_starts_right_centers.MP4" type="video/mp4">
+                                        <source src="videos/fallacy/boba_69_diag_starts_right_centersb.mp4" type="video/mp4">
                                         Your browser does not support the video tag.
                                     </video>
                                 </div>
                                  <div class="video-item">
                                     <p class="video-label">Diag: Rendered (Right Init)</p>
                                     <video autoplay loop muted playsinline>
-                                        <source src="videos/fallacy/boba_69_diag_starts_right_rendered.MP4" type="video/mp4">
+                                        <source src="videos/fallacy/boba_69_diag_starts_right_renderedb.mp4" type="video/mp4">
                                         Your browser does not support the video tag.
                                     </video>
                                 </div>
                                 <div class="video-item">
                                     <p class="video-label">Removal Attempt (Baseline)</p>
                                     <video autoplay loop muted playsinline>
-                                        <source src="videos/fallacy/boba_69_remove_iter10000.MP4" type="video/mp4">
+                                        <source src="videos/fallacy/boba_69_remove_iter10000b.mp4" type="video/mp4">
                                         Your browser does not support the video tag.
                                     </video>
                                 </div>
@@ -209,7 +209,7 @@
                             <figcaption>Fig. Y: Gaussian center tracks for Boba scene. Left: Baseline (No Flow Loss). Right: With Optical Flow Loss.</figcaption>
                         </figure>
                     </section>
-                    
+
                     <section id="limitations">
                         <h3>4.4 Limitations & Failure Cases</h3>
                         <p>While optical flow supervision improves consistency, challenges remain, especially for very long sequences or extremely complex motions where tracking can degrade after many frames.</p>
@@ -224,13 +224,13 @@
                     <section id="teaser-demo">
                         <h3>4.5 Teaser: Object Recolor and Removal</h3>
                         <p>The primary capability we aim for is robust object editing. Here we showcase our method's ability to recolor and remove a target object (a bear) with improved temporal consistency compared to a baseline model trained without optical flow guidance.</p>
-                        
+
                         <!-- Interactive Slider for Bear Recolor -->
                         <div class="comparison-container">
                             <h4>Bear Recolor Comparison</h4>
                             <div class="video-wrapper">
                                 <video autoplay loop muted playsinline width="100%" class="comparison-video-under">
-                                    <source src="videos/downstream/bear_39_bear interior_recolored_to_0_0_0_0_1_0_w0_20_iter10000_optflow30000_pts249243.MP4" type="video/mp4">
+                                    <source src="videos/downstream/bear_39_bear interior_recolored_to_0_0_0_0_1_0_w0_20_iter10000_optflow30000_pts249243b.mp4" type="video/mp4">
                                 </video>
                                 <video autoplay loop muted playsinline width="100%" class="comparison-video-over">
                                     <source src="videos/downstream/bear_39.mp4" type="video/mp4">

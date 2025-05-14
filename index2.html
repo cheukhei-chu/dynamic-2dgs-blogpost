@@ -60,11 +60,21 @@
             </header>
 
             <article>
-                <section id="introduction">
-                    <h2>1. Introduction</h2>
-                    <p>Dynamic 2D Gaussian Splatting has emerged as a promising technique for representing videos, offering high-fidelity reconstruction and fast rendering. However, standard training procedures often result in representations where individual Gaussians lack long-term object-centric coherence. This fundamentally limits the ability to perform robust object-level editing tasks like removal or recoloring, as edits applied to Gaussians identified at one point in time do not consistently follow the object's perceived motion.</p>
-                    <p>Our initial explorations revealed an intriguing phenomenon: the appearance of moving objects is often formed by what we term a "wave effect," where different local Gaussians activate and contribute at different times, rather than a consistent set of "object Gaussians" rigidly tracking the object. This project investigates the hypothesis that supervising the training of dynamic 2D Gaussians with dense optical flow information can enforce more coherent, object-like trajectories for the learned primitives. We demonstrate that by incorporating an optical flow consistency loss, the resulting model exhibits significantly improved temporal tracking of edited objects, allowing for more plausible object removal and recoloring. We analyze the change in learned Gaussian behavior and discuss the implications and remaining challenges of this approach.</p>
-                </section>
+                <section id="motivation">
+                   <h2>1. Motivation</h2>
+                   <p>Recent advances in neural rendering, particularly 3D Gaussian Splatting (3DGS) (Kerbl et al., 2023), have enabled high-fidelity, real-time rendering of static scenes. The extension to Dynamic 3D Gaussians (Luiten et al., 2023) further allows for the modeling of complex dynamic 3D scenes, capturing motion and enabling novel-view synthesis over time along with dense 6-DOF tracking. While powerful, these methods explicitly model the full 3D scene structure, which can be computationally intensive and potentially overkill for applications focused solely on analyzing or manipulating video content from the original viewpoints.</p>
+                   <p>Concurrently, the efficiency of using 2D Gaussians for static image representation and compression has been demonstrated by GaussianImage (Zhang et al., 2024), which achieves extremely fast rendering speeds by representing images as collections of optimized 2D Gaussian primitives. This motivates the question of whether dynamic 2D Gaussian representation can effectively model video sequences, capturing complex motion and temporal coherence, and as such enabling basic video analysis while offering significant efficiency advantages over 3D dynamic modeling. In this project, we propose Flowing Gaussians, a method of representing a video using dynamic 2D Gaussians, supervised by optical flow, that allows all sorts of efficient object-based downstream video editing tasks. </p>
+               </section>
+
+
+               <section id="overview">
+                   <h2>2. Overview</h2>
+                   <p>Dynamic 2D Gaussian Splatting has emerged as a promising technique for representing videos, offering high-fidelity reconstruction and fast rendering. However, standard training procedures often result in representations where individual Gaussians lack long-term object-centric coherence. This fundamentally limits the ability to perform robust object-level editing tasks like removal or recoloring, as edits applied to Gaussians identified at one point in time do not consistently follow the object's perceived motion.</p>
+                   <p>Our initial explorations revealed an intriguing phenomenon: the appearance of moving objects is often formed by what we term a "wave effect," where different local Gaussians activate and contribute at different times, rather than a consistent set of "object Gaussians" rigidly tracking the object. This project investigates the hypothesis that supervising the training of dynamic 2D Gaussians with dense optical flow information can enforce more coherent, object-like trajectories for the learned primitives. We demonstrate that by incorporating an optical flow consistency loss, the resulting model exhibits significantly improved temporal tracking of edited objects, allowing for more plausible object removal and recoloring. We analyze the change in learned Gaussian behavior and discuss the implications and remaining challenges of this approach.</p>
+                   <p>At the heart of Flowing Gaussians are two key design decisions aimed at enhancing both the representational power and training efficiency for dynamic scenes. Firstly, diverging from simpler trajectory models such as in VeGaS (Smolak-Dyżewska et al., 2024), we leverage B-splines to model the temporal evolution of individual Gaussian parameters (such as position and shape). Secondly, to ensure these dynamic Gaussians accurately track objects through complex movements and interactions, we integrate optical flow as an explicit guiding signal during training. These decisions will be explained in depth and illustrated using video examples in order in Sections 4 and 5.</p>
+                   <p>In this post, we will detail the architecture of our optical flow-guided dynamic 2D Gaussian Splatting method, elaborating on design decisions, and demonstrating its efficacy in video reconstruction and object tracking in Sections 4 and 5. Finally, we will showcase its application in downstream video editing tasks, highlighting the efficiency gained by our one-shot segmentation approach for persistent object editing.</p>
+               </section>
+
 
                 <section id="visualizing-dynamics"> <!-- NEW HOOK SECTION -->
                     <h2>2. Visualizing Learned Dynamics: The "Wave"</h2>
@@ -73,13 +83,13 @@
                         <div class="video-row video-row-layout-2">
                             <div class="video-item">
                                 <p class="video-label">Boba Cup Centers (Baseline)</p>
-                                <video autoplay loop muted playsinline class="vertical-video-constrained"> 
+                                <video autoplay loop muted playsinline class="vertical-video-constrained">
                                     <source src="videos/fallacy/boba_69_centers_iter_10000_fast.mp4" type="video/mp4">
                                 </video>
                             </div>
                              <div class="video-item">
                                 <p class="video-label">"Walking Up Stairs" Centers (Baseline)</p>
-                                <video autoplay loop muted playsinline class="vertical-video-constrained"> 
+                                <video autoplay loop muted playsinline class="vertical-video-constrained">
                                     <source src="videos/fun results/margulan_63_centers_iter_10000.MP4" type="video/mp4">
                                 </video>
                             </div>
@@ -170,13 +180,13 @@ Despite rapid progress, current splatting methods lack <em>semantic grouping</em
                             <div class="video-row video-row-layout-2">
                                 <div class="video-item">
                                     <p class="video-label">Centers (Right Init, Baseline)</p>
-                                    <video autoplay loop muted playsinline class="vertical-video-constrained"> 
+                                    <video autoplay loop muted playsinline class="vertical-video-constrained">
                                         <source src="videos/fallacy/boba_69_diag_starts_right_centers.MP4" type="video/mp4">
                                     </video>
                                 </div>
                                  <div class="video-item">
                                     <p class="video-label">Rendered (Right Init, Baseline)</p>
-                                    <video autoplay loop muted playsinline class="vertical-video-constrained"> 
+                                    <video autoplay loop muted playsinline class="vertical-video-constrained">
                                         <source src="videos/fallacy/boba_69_diag_starts_right_rendered.MP4" type="video/mp4">
                                     </video>
                                 </div>
@@ -231,7 +241,7 @@ Despite rapid progress, current splatting methods lack <em>semantic grouping</em
                             <figcaption>Fig 7: Gaussian center tracks for "boba". Left: Baseline. Right: With Flow Loss.</figcaption>
                         </figure>
                     </section>
-                    
+
                     <section id="editing-demos">
                         <h3>5.5 Editing Demonstrations with Flow-Supervised Model</h3>
                         <p>The improved object coherence enables more compelling editing applications. Here we show object recoloring on the "bear\_39" video.</p>
