@@ -46,10 +46,9 @@
                 <ul>
                   <li><a href="#setup">4.1 Experimental Setup</a></li>
                   <li><a href="#reconstruction-quality">4.2 Reconstruction Quality</a></li>
-                  <li><a href="#object-removal-comparison">4.3 Object Removal / Void Tracking</a></li>
-                  <li><a href="#gaussian-motion-analysis">4.4 Gaussian Motion Analysis</a></li>
-                  <li><a href="#editing-demos">4.5 Editing Demonstrations</a></li>
-                  <li><a href="#limitations-failures">4.6 Limitations & Failure Cases</a></li>
+                  <li><a href="#gaussian-motion-analysis">4.3 Gaussian Motion Analysis</a></li>
+                  <li><a href="#editing-demos">4.4 Editing Demonstrations</a></li>
+                  <li><a href="#limitations-failures">4.5 Limitations & Failure Cases</a></li>
                 </ul>
               </li>
 
@@ -179,8 +178,8 @@
                         <p>Our baseline model represents a video using \(N\) 2D Gaussian primitives. Each Gaussian \(G_i\) is characterized by a static color \( \mathbf{c}_i \in \mathbb{R}^3 \) and time-varying parameters for its 2D center \( \mathbf{xy}_i(t) \in \mathbb{R}^2 \), its 2D covariance matrix \( \mathbf{\Sigma}_i(t) \), and its opacity \( \alpha_i(t) \in [0,1] \). The covariance \( \mathbf{\Sigma}_i(t) = \mathbf{L}_i(t)\mathbf{L}_i(t)^T \) is parameterized by the elements of its lower-triangular Cholesky factor \( \mathbf{L}_i(t) = [[L_{00}(t), 0], [L_{10}(t), L_{11}(t)]] \). These dynamic parameters (centers, Cholesky elements, opacity) are modeled as B-spline functions of time \(t \in [0,1]\) with degree \(p\) and \(K\) control points \(\{\mathbf{CP}_{i,j}\}\):
                         </p>
                         <p>\[ \text{param}_i(t) = \sum_{j=0}^{K-1} N_{j,p}(t) \cdot \mathbf{CP}_{i,j}^{\text{param}} \]</p>
-                        <p>The model is trained by minimizing a reconstruction loss between the rendered frames \(\hat{I}(t)\) and ground truth frames \(I_{\text{gt}}(t)\), typically a combination of L1 and MS-SSIM (our "Fusion4" loss):</p>
-                        <p>\[ \mathcal{L}_{\text{recon}} = \sum_{t} \left( \lambda_{\text{L1}} \|\hat{I}(t) - I_{\text{gt}}(t)\|_1 + (1-\lambda_{\text{L1}})(1 - \text{MS-SSIM}(\hat{I}(t), I_{\text{gt}}(t))) \right) \]</p>
+                        <p>The model is trained by minimizing an L2 reconstruction loss between the rendered frames \(\hat{I}(t)\) and ground truth frames \(I_{\text{gt}}(t)\):</p>
+                        <p>\[ \mathcal{L}_{\text{recon}} = \sum_{t} \|\hat{I}(t) - I_{\text{gt}}(t)\|_2^2 \]</p>
                     </section>
                     <section id="wave-effect-analysis-detailed">
                         <h3>3.2 Deeper Dive: The "Wave Effect"</h3>
@@ -220,7 +219,7 @@
                     <h2>4. Experiments & Results</h2>
                     <section id="setup">
                         <h3>4.1 Experimental Setup</h3>
-                        <p>We evaluate our approach on several short video clips, including "boba_69" (a boba tea cup moving across a textured background, 69 frames, 192x336 resolution after processing) and "bear_39" (a bear walking, 39 frames). Our models typically use 40,000 2D Gaussians, with B-spline trajectories (K=20 control points for position and Cholesky elements, degree \(p=3\)). Opacity is modeled with a polynomial of degree 0 (static per Gaussian after initialization). Training is performed for 10,000 iterations using the Adan optimizer (learning rate 1e-3) and the "Fusion4" (L1 + MS-SSIM) reconstruction loss. For the optical flow supervised model, \(\lambda_{\text{flow}}\) was set to \(1 \times 10^4\). Object segmentation for editing is performed post-training using SAM on user-annotated keyframes, followed by optional motion coherence filtering (DBSCAN on B-spline control point features).</p>
+                        <p>We evaluate our approach on several short video clips, including "boba_69" (a boba tea cup moving across a textured background, 69 frames, 192x336 resolution after processing) and "bear_39" (a bear walking, 39 frames). Our models typically use 40,000 2D Gaussians, with B-spline trajectories (K=20 control points for position and Cholesky elements, degree \(p=3\)). Opacity is modeled with a polynomial of degree 0 (static per Gaussian after initialization). Training is performed for 10,000 iterations using the Adan optimizer (learning rate 1e-3) and the L2 reconstruction loss. For the optical flow supervised model, \(\lambda_{\text{flow}}\) was set to \(1 \times 10^4\). Object segmentation for editing is performed post-training using SAM on user-annotated keyframes, followed by optional motion coherence filtering (DBSCAN on B-spline control point features).</p>
                     </section>
                     <section id="reconstruction-quality">
                         <h3>4.2 Reconstruction Quality</h3>
@@ -231,13 +230,8 @@
                         </figure>
                     </section>
 
-                    <section id="object-removal-comparison">
-                        <h3>4.3 Object Removal / Void Tracking</h3>
-                        <p>A key test of object coherence is the behavior of the scene when a segmented object is removed. The baseline model often results in a "static void" (shown previously in Fig 3). With optical flow supervision, the void created by removing an object like the boba cup is expected to more accurately track the object\'s original path, demonstrating improved temporal consistency of the underlying Gaussian trajectories. We aim to showcase such an improved removal video if generated from a flow-supervised model.</p>
-                    </section>
-
                     <section id="gaussian-motion-analysis">
-                        <h3>4.4 Gaussian Motion Analysis</h3>
+                        <h3>4.3 Gaussian Motion Analysis</h3>
                         <p>Visualizing Gaussian center trajectories clearly illustrates the impact of optical flow. In the baseline, Gaussians exhibit localized, oscillatory motion. With flow supervision, they learn more coherent, long-range transport paths that better align with object movement.</p>
                         <figure class="side-by-side-video-pair">
                             <div class="video-row video-row-layout-2">
@@ -256,8 +250,8 @@
                     </section>
 
                     <section id="editing-demos">
-                        <h3>4.5 Editing Demonstrations</h3>
-                        <p>The improved object coherence from optical flow supervision enables more compelling editing applications. Below, we showcase object recoloring for the "bear_39" video. The edit consistently follows the bear's motion due to the enhanced trajectory learning.</p>                         <div class="comparison-container">
+                        <h3>4.4 Editing Demonstrations</h3>
+                        <p>The improved object coherence from optical flow supervision enables more compelling and efficient editing applications. To achieve edits like the object recoloring showcased below for the "bear_39" video, we first apply the Segment Anything Model (SAM) over a user-defined bounding box containing the bear in a reference frame. SAM segments the bear, and we then identify the set of 2D Gaussians whose centers fall within this segmentation mask at that frame. This effectively filters the Gaussians representing the bear. Once these object-specific Gaussians are identified, their parameters (e.g., color) can be modified. Subsequent rendering of the edited video, now with the modified Gaussians, is extremely fast, taking less than 1 second for the entire clip, as it leverages the pre-optimized dynamic representation. The edit consistently follows the bear's motion due to the enhanced trajectory learning from the optical flow supervision.</p>                         <div class="comparison-container">
                             <div class="video-wrapper">
                                 <video autoplay loop muted playsinline width="100%" class="comparison-video-under" id="bearPurpleColor">
                                     <source src="videos/downstream/bear_39_bear interior_recolored_to_0_0_0_0_1_0_w0_20_iter10000_optflow30000_pts249243b.mp4" type="video/mp4">
@@ -284,7 +278,7 @@
                     </section>
 
                     <section id="limitations-failures">
-                        <h3>4.6 Limitations & Failure Cases</h3>
+                        <h3>4.5 Limitations & Failure Cases</h3>
                         <p>While optical flow supervision improves consistency, challenges remain, particularly for very long sequences or extremely complex motions where tracking can degrade. For instance, in a 20-frame "boba" clip where the cup is recolored purple, we observe that towards the end of its trajectory, some edges of the boba cup may lose their purple coloring as the initially labeled Gaussians struggle to perfectly maintain coverage and coherence over the extended motion (Fig. 10).</p>
                         <figure>
                              <video autoplay loop muted playsinline width="70%" class="vertical-video-constrained standalone-boba-video">
@@ -317,7 +311,7 @@
                     </ol>
                 </section>
                 <footer>
-                    <p>© 2025 Your Name(s). Final Project for 6.8300 Computer Vision, MIT.</p>
+                    <p>© 2025 Cheuk-Hei Chu, Margulan Ismoldayev. Final Project for 6.8300 Computer Vision, MIT.</p>
                 </footer>
             </article>
         </main>
