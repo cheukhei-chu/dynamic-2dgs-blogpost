@@ -31,126 +31,161 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('scroll', updateActiveTocLink);
     setTimeout(updateActiveTocLink, 100); // Initial check
 
-    // --- Canvas Bear Comparison Slider Logic (New) ---
-    const box = document.querySelector('#bear-compare');
-    if (box) {
-        const canvas = box.querySelector('canvas');
-        const ctx = canvas.getContext('2d');
-        const videoUnder = box.querySelector('#bearUnder'); // Original Bear
-        const videoOver = box.querySelector('#bearOver');   // Recolored Bear
-        const handle = box.querySelector('.comparison-slider');
+    // --- Video Comparison Slider Logic ---
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+    /* Treat clip‑path as broken on iOS */
+    const clipPathSupported =
+          CSS.supports('(clip-path: inset(0 50% 0 0))') ||
+          CSS.supports('(-webkit-clip-path: inset(0 50% 0 0))');
+    console.log('clipPathSupported=', clipPathSupported, 'iOS=', isIOS);
 
-        if (canvas && ctx && videoUnder && videoOver && handle) {
-            Promise.all([
-                new Promise(r => videoUnder.onloadedmetadata = r),
-                new Promise(r => videoOver.onloadedmetadata = r)
-            ]).then(() => {
-                const { videoWidth: w, videoHeight: h } = videoUnder; // Use one video for dimensions
-                canvas.width = w;
-                canvas.height = h;
-                videoUnder.play();
-                videoOver.play();
-                draw();
-            }).catch(error => {
-                console.error("Error loading video metadata for canvas comparison:", error);
-            });
+    const comparisonContainers = document.querySelectorAll('.comparison-container');
 
-            // Sync playback time
-            videoUnder.addEventListener('timeupdate', () => {
-                if (Math.abs(videoUnder.currentTime - videoOver.currentTime) > 0.05) { // Tighter threshold
-                    videoOver.currentTime = videoUnder.currentTime;
-                }
-            });
-            videoOver.addEventListener('timeupdate', () => {
-                if (Math.abs(videoOver.currentTime - videoUnder.currentTime) > 0.05) { // Tighter threshold
-                    videoUnder.currentTime = videoOver.currentTime;
-                }
-            });
-            // Ensure they also sync on play/pause if user interacts with video controls (though hidden)
-            const syncPlayState = (master, slave) => {
-                if (master.paused && !slave.paused) slave.pause();
-                if (!master.paused && slave.paused) slave.play();
-            };
-            videoUnder.addEventListener('play', () => syncPlayState(videoUnder, videoOver));
-            videoUnder.addEventListener('pause', () => syncPlayState(videoUnder, videoOver));
-            videoOver.addEventListener('play', () => syncPlayState(videoOver, videoUnder));
-            videoOver.addEventListener('pause', () => syncPlayState(videoOver, videoUnder));
+    comparisonContainers.forEach(container => {
+        const videoOver = container.querySelector('.comparison-video-over');
+        const videoOverWrapper = container.querySelector('.video-over-wrapper');
+        const sliderElement = container.querySelector('.comparison-slider');
+        const videoUnder = container.querySelector('.comparison-video-under');
 
-            let split = 0.5; // 0 (left) to 1 (right) position of the slider
-            const boxRect = () => box.getBoundingClientRect();
-
-            function draw() {
-                ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear canvas each frame
-
-                const splitPixel = canvas.width * split;
-
-                // Draw the left part: original video (videoUnder)
-                if (videoUnder.readyState >= 2) { // HAVE_CURRENT_DATA
-                    const sWidth = videoUnder.videoWidth * split; // Source width from original video
-                    if (isFinite(splitPixel) && splitPixel > 0 && isFinite(canvas.height) && canvas.height > 0) {
-                        ctx.drawImage(videoUnder, 
-                                      0, 0, sWidth, videoUnder.videoHeight, // Source rect (left part of original video)
-                                      0, 0, splitPixel, canvas.height);    // Destination rect (left part of canvas)
-                    }
-                }
-
-                // Draw the right part: recolored video (videoOver)
-                if (videoOver.readyState >= 2) { // HAVE_CURRENT_DATA
-                    const sX = videoOver.videoWidth * split; // Source X from recolored video
-                    const sWidth = videoOver.videoWidth * (1 - split); // Source width from recolored video
-                    const dWidth = canvas.width * (1 - split); // Destination width on canvas
-
-                    if (isFinite(dWidth) && dWidth > 0 && isFinite(canvas.height) && canvas.height > 0) {
-                        ctx.drawImage(videoOver, 
-                                      sX, 0, sWidth, videoOver.videoHeight,         // Source rect (right part of recolored video)
-                                      splitPixel, 0, dWidth, canvas.height); // Destination rect (right part of canvas)
-                    }
-                }
-                requestAnimationFrame(draw);
-            }
-
-            const startDrag = e => {
-                e.preventDefault();
-                const move = e.type === 'mousedown' ? 'mousemove' : 'touchmove';
-                const stop = e.type === 'mousedown' ? 'mouseup' : 'touchend';
-                const onMove = ev => {
-                    const x = (move === 'mousemove' ? ev.clientX : ev.touches[0].clientX) -
-                        boxRect().left;
-                    split = Math.max(0, Math.min(1, x / boxRect().width));
-                    handle.style.left = (split * 100) + '%';
-                };
-                document.addEventListener(move, onMove, { passive: false });
-                document.addEventListener(stop, () => {
-                    document.removeEventListener(move, onMove);
-                }, { once: true });
-            };
-            handle.addEventListener('mousedown', startDrag);
-            handle.addEventListener('touchstart', startDrag, { passive: false });
-        } else {
-            console.warn("#bear-compare canvas comparison is missing one or more required child elements (canvas, #bearUnder, #bearOver, .comparison-slider).");
+        if (!videoOver || !videoOverWrapper || !sliderElement || !videoUnder) {
+            console.warn("Comparison container missing required elements (videoOver, videoOverWrapper, sliderElement, or videoUnder):", container);
+            return;
         }
-    } else {
-        // console.log("#bear-compare element not found, canvas slider not initialized."); // Optional: log if element not found
-    }
+
+        // Initial setup based on the determined strategy
+        if (clipPathSupported) { // Desktop and good browsers
+            videoOverWrapper.style.clipPath = 'inset(0 50% 0 0)';
+            videoOverWrapper.style.webkitClipPath = 'inset(0 50% 0 0)';
+            // Ensure wrapper defers to CSS for full width
+            videoOverWrapper.style.width = ''; 
+            videoOverWrapper.style.right = ''; 
+            videoOver.style.clipPath = ''; // Clear any direct clipPath on video
+            videoOver.style.webkitClipPath = ''; // Clear any direct clipPath on video
+        } else { // Fallback for iOS or browsers where clip-path on video is buggy
+            videoOverWrapper.style.width = '50%';
+            videoOverWrapper.style.right = 'auto'; // Allow width to take effect
+            videoOver.style.clipPath = 'none';
+            videoOver.style.webkitClipPath = 'none';
+            videoOverWrapper.style.clipPath = ''; // Clear clipPath on wrapper if not supported
+            videoOverWrapper.style.webkitClipPath = ''; // Clear clipPath on wrapper if not supported
+        }
+        
+        // Sync playback and volume
+        function syncVideos(master, slave) {
+            if (master.paused !== slave.paused) {
+                if (master.paused) slave.pause(); else slave.play();
+            }
+            if (Math.abs(master.currentTime - slave.currentTime) > 0.2) { // Sync if more than 0.2s diff
+                slave.currentTime = master.currentTime;
+            }
+            slave.volume = master.volume;
+            slave.muted = master.muted;
+        }
+
+        videoUnder.addEventListener('play', () => { if(videoOver.paused) videoOver.play(); });
+        videoUnder.addEventListener('pause', () => { if(!videoOver.paused) videoOver.pause(); });
+        videoUnder.addEventListener('volumechange', () => { videoOver.volume = videoUnder.volume; videoOver.muted = videoUnder.muted; });
+        videoUnder.addEventListener('timeupdate', () => { // More robust syncing
+            if (Math.abs(videoUnder.currentTime - videoOver.currentTime) > 0.5) { // Sync if more than 0.5s diff
+                videoOver.currentTime = videoUnder.currentTime;
+            }
+        });
+         videoOver.addEventListener('timeupdate', () => { // Sync other way too
+            if (Math.abs(videoOver.currentTime - videoUnder.currentTime) > 0.5) {
+                videoUnder.currentTime = videoOver.currentTime;
+            }
+        });
+
+
+        let isDragging = false;
+
+        function updateClip(xPosition) {
+            const containerRect = container.getBoundingClientRect();
+            let percentage = ((xPosition - containerRect.left) / containerRect.width) * 100;
+            percentage = Math.max(0, Math.min(100, percentage)); // Clamp between 0 and 100
+
+            if (clipPathSupported) { // Desktop and good browsers
+                videoOverWrapper.style.clipPath = `inset(0 ${100 - percentage}% 0 0)`;
+                videoOverWrapper.style.webkitClipPath  = `inset(0 ${100 - percentage}% 0 0)`;
+                // Ensure wrapper defers to CSS (no specific action needed here for update if already full via CSS)
+            } else { // Fallback for iOS
+                videoOverWrapper.style.width = `${percentage}%`;
+                videoOverWrapper.style.right = 'auto'; // Ensure right remains auto for width to apply
+            }
+            sliderElement.style.left = `${percentage}%`;
+        }
+
+        sliderElement.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            sliderElement.classList.add('dragging'); // Optional: for styling
+            // Play both videos if paused when interaction starts
+            if(videoUnder.paused) videoUnder.play();
+            if(videoOver.paused) videoOver.play();
+        });
+
+        document.addEventListener('mouseup', () => {
+            if (isDragging) {
+                isDragging = false;
+                sliderElement.classList.remove('dragging');
+            }
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (isDragging) {
+                updateClip(e.clientX);
+            }
+        });
+        
+        // Touch events for mobile
+        sliderElement.addEventListener('touchstart', (e) => {
+            isDragging = true;
+            sliderElement.classList.add('dragging');
+            if(videoUnder.paused) videoUnder.play();
+            if(videoOver.paused) videoOver.play();
+            // Prevent page scroll while dragging slider
+            e.preventDefault(); 
+        }, { passive: false });
+
+        document.addEventListener('touchend', () => {
+            if (isDragging) {
+                isDragging = false;
+                sliderElement.classList.remove('dragging');
+            }
+        });
+
+        document.addEventListener('touchmove', (e) => {
+            if (isDragging) {
+                updateClip(e.touches[0].clientX);
+            }
+        });
+
+
+        // Initial clip based on default slider value (if slider input type range was used)
+        // updateClip(sliderElement.getBoundingClientRect().left + (sliderElement.value / 100) * container.offsetWidth);
+        // For our div slider, initial clip is set by CSS.
+    });
 
     // --- Side-by-Side Video Sync Logic ---
     const sideBySidePairs = document.querySelectorAll('.side-by-side-video-pair');
     sideBySidePairs.forEach(pairContainer => {
-        const videoItems = pairContainer.querySelectorAll('.video-item video');
+        const videoItems = pairContainer.querySelectorAll('.video-item video'); // Get all video elements within .video-item
 
         if (videoItems.length >= 2) {
             const videoLeft = videoItems[0];
             const videoRight = videoItems[1];
 
+            // Autoplay videos (since they are muted and loop)
             videoLeft.play().catch(error => console.error("Error attempting to autoplay videoLeft:", error, videoLeft.src));
             videoRight.play().catch(error => console.error("Error attempting to autoplay videoRight:", error, videoRight.src));
 
+            // Sync playback time (master: videoLeft, slave: videoRight)
             videoLeft.addEventListener('timeupdate', () => {
-                if (Math.abs(videoLeft.currentTime - videoRight.currentTime) > 0.2) {
+                if (Math.abs(videoLeft.currentTime - videoRight.currentTime) > 0.2) { // Sync if more than 0.2s diff
                     videoRight.currentTime = videoLeft.currentTime;
                 }
             });
 
+            // Sync playback time (master: videoRight, slave: videoLeft) - for redundancy if one seeks
             videoRight.addEventListener('timeupdate', () => {
                 if (Math.abs(videoRight.currentTime - videoLeft.currentTime) > 0.2) {
                     videoLeft.currentTime = videoRight.currentTime;
@@ -158,7 +193,12 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         } else {
             console.warn("Side-by-side video pair container missing required video elements (expected at least 2 videos within .video-item):", pairContainer);
+            return; // Skip this pair if not enough videos found
         }
+        
+        // Optional: if you want them to start playing automatically when they scroll into view
+        // You might need an Intersection Observer for that.
+        // For now, they are muted and loop, and will play once the button is clicked.
     });
 
     // JuxtaposeJS init for image sliders (if you keep it)
@@ -170,4 +210,20 @@ document.addEventListener('DOMContentLoaded', () => {
     // }
 });
 
-// The global updateComparison function can be removed as it's no longer used by the new canvas slider or other functionalities.
+// Global function for Juxtapose slider compatibility (if still using its HTML structure)
+// This function would be called by an oninput event of a range slider if you were using
+// Juxtapose's HTML structure for the slider itself. The new CSS slider is different.
+function updateComparison(slider) {
+    const container = slider.closest('.comparison-container');
+    if (!container) return;
+    const videoOver = container.querySelector('.comparison-video-over');
+    const sliderHandle = container.querySelector('.comparison-slider'); // The draggable div
+    
+    const percentage = slider.value; // Assuming slider is an <input type="range">
+    videoOver.style.clipPath = `inset(0 ${100 - percentage}% 0 0)`;
+    
+    // If you are also moving a custom div slider handle based on an input range:
+    if (sliderHandle) {
+      sliderHandle.style.left = `${percentage}%`;
+    }
+}
